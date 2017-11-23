@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTableExt", "..\Src\ConsoleTableExt\ConsoleTableExt.csproj", "{AB7BC904-D18D-4033-9625-E80877D2F94E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTableExt", "Src\ConsoleTableExt\ConsoleTableExt.csproj", "{AB7BC904-D18D-4033-9625-E80877D2F94E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTableExtTest", "..\Src\ConsoleTableExtTest\ConsoleTableExtTest.csproj", "{BF0B6B53-68B4-4A86-B9DC-2592042F9C0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTableExtTest", "Src\ConsoleTableExtTest\ConsoleTableExtTest.csproj", "{BF0B6B53-68B4-4A86-B9DC-2592042F9C0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
