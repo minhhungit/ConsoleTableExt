@@ -10,3 +10,5 @@
 /ConsoleTableExtSolution/packages/NUnit.3.9.0
 /packages/NUnit.3.9.0
 /.vs/ConsoleTableExtSolution/v15
+/Src/ConsoleTableApp/bin/Debug
+/Src/ConsoleTableApp/obj/Debug
