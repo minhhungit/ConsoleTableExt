@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ConsoleTableExtSolution/.vs/ConsoleTableExtSolution/v15
+/Src/ConsoleTableExt/bin/Debug
+/Src/ConsoleTableExt/obj/Debug
+/Src/ConsoleTableExtTest/bin/Debug
+/Src/ConsoleTableExtTest/obj/Debug
+/ConsoleTableExtSolution/packages/NUnit.3.9.0
