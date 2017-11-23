@@ -15,11 +15,16 @@ namespace ConsoleTableExtTest
         [Test]
         public void Export_Test()
         {
+            var optionDefault = new ConsoleTableExportOption {IncludeRowCount = IncludeRowCountType.Top};
+            var optionAlternative = new ConsoleTableExportOption {ExportFormat = ConsoleTableFormat.Alternative};
+            var optionMarkDown = new ConsoleTableExportOption { ExportFormat = ConsoleTableFormat.MarkDown};
+            var optionMinimal = new ConsoleTableExportOption {ExportFormat = ConsoleTableFormat.Minimal, IncludeRowCount = IncludeRowCountType.Bottom};
+
             var result0 = ConsoleTableBuilder.From(GetTable()).Export().ToString();
-            var result1 = ConsoleTableBuilder.From(GetTable()).Export(ConsoleTableFormat.Default).ToString();
-            var result2 = ConsoleTableBuilder.From(GetTable()).Export(ConsoleTableFormat.Alternative).ToString();
-            var result3 = ConsoleTableBuilder.From(GetTable()).Export(ConsoleTableFormat.MarkDown).ToString();
-            var result4 = ConsoleTableBuilder.From(GetTable()).Export(ConsoleTableFormat.Minimal).ToString();
+            var result1 = ConsoleTableBuilder.From(GetTable()).Export(optionDefault).ToString();
+            var result2 = ConsoleTableBuilder.From(GetTable()).Export(optionAlternative).ToString();
+            var result3 = ConsoleTableBuilder.From(GetTable()).Export(optionMarkDown).ToString();
+            var result4 = ConsoleTableBuilder.From(GetTable()).Export(optionMinimal).ToString();
 
             var rows = Enumerable.Repeat(new Something("I am using a sample project for Entity Framework"), 1000).ToList();
             rows.AddRange(Enumerable.Repeat(new Something("GetCustomAttribute is not recognized"), 1000).ToList());
@@ -30,15 +35,9 @@ namespace ConsoleTableExtTest
 
             var result5 = ConsoleTableBuilder.From(rows)
                 .AddColumn(new List<string> {"A", "B", "C"}, true)
-                .AddRow(new object[] {"1", "2", "3"})
-                .AddRow(new object[] {"11", "22", "33"})
-                .AddRow(new object[] {"111", "222", "333"})
-                .AddRow(new List<object[]>
-                {
-                    new object[] {"x", "y", "z"},
-                    new object[] {"k", "m", "n"},
-                    new object[] {"h", "a", "a"}
-                })
+                .AddRow("1", "2", "3")
+                .AddRow("11", "22", "33")
+                .AddRow("111", "222", "333")
                 .AddColumn(new List<string> { "ColA", "ColB", "ColC" }, true)
                 .Export().ToString();
         }

@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleTableExportOption.cs" />
     <Compile Include="IConsoleTableDataStore.cs" />
     <Compile Include="ConsoleTableBuilderExtensions.cs" />
     <Compile Include="ConsoleTableBuilder.cs" />

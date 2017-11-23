@@ -27,74 +27,60 @@ namespace ConsoleTableExt
             return builder;
         }
 
-        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, List<object[]> values)
+        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, params object[] values)
         {
-            foreach (var item in values)
-            {
-                builder.AddRow(item);
-            }
-
-            return builder;
-        }
-
-        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, object[] item)
-        {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
+            if (values == null)
+                throw new ArgumentNullException(nameof(values));
 
             if (!builder.Columns.Any())
                 throw new Exception("Please set the columns first");
 
-            if (builder.Columns.Count != item.Length)
+            if (builder.Columns.Count != values.Length)
                 throw new Exception(
-                    $"The number columns in the row ({builder.Columns.Count}) does not match the values ({item.Length}");
+                    $"The number columns in the row ({builder.Columns.Count}) does not match the values ({values.Length}");
 
-            builder.Rows.Add(item);
+            builder.Rows.Add(values);
 
             return builder;
         }
 
         public static StringBuilder Export(this ConsoleTableBuilder builder)
         {
-            return builder.Export(ConsoleTableFormat.Default);
+            return builder.Export(new ConsoleTableExportOption());
         }
 
-        public static StringBuilder Export(this ConsoleTableBuilder builder, ConsoleTableFormat tableFormat)
+        public static StringBuilder Export(this ConsoleTableBuilder builder, ConsoleTableExportOption option)
         {
-            return Export(builder, tableFormat, '|');
-        }
-
-        public static StringBuilder Export(this ConsoleTableBuilder builder, ConsoleTableFormat tableFormat, char delimiter)
-        {
-            switch (tableFormat)
+            switch (option.ExportFormat)
             {
                 case ConsoleTableFormat.Default:
-                    return ToDefaultString(builder, delimiter);
+                    return ToDefaultString(builder, option);
                 case ConsoleTableFormat.Minimal:
-                    return ToMarkDownString(builder, Char.MinValue);
+                    option.Delimiter = Char.MinValue;
+                    return ToMarkDownString(builder, option);
                 case ConsoleTableFormat.Alternative:
-                    return ToAlternativeString(builder, delimiter);
+                    return ToAlternativeString(builder, option);
                 case ConsoleTableFormat.MarkDown:
-                    return ToMarkDownString(builder, delimiter);
+                    return ToMarkDownString(builder, option);
                 default:
-                    return ToDefaultString(builder, delimiter);
+                    return ToDefaultString(builder, option);
             }
         }
 
-        private static StringBuilder ToDefaultString(ConsoleTableBuilder builder)
-        {
-            return ToDefaultString(builder, '|');
-        }
 
-        private static StringBuilder ToDefaultString(ConsoleTableBuilder builder, char delimiter)
+        private static StringBuilder ToDefaultString(ConsoleTableBuilder builder, ConsoleTableExportOption option)
         {
             var strBuilder = new StringBuilder();
+            if (option.IncludeRowCount == IncludeRowCountType.Top)
+            {
+                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+            }
 
             // find the longest column by searching each row
             var columnLengths = builder.ColumnLengths();
 
             // create the string format with padding
-            var format = builder.Format(columnLengths, delimiter);
+            var format = builder.Format(columnLengths, option.Delimiter);
 
             // find the longest formatted line
             var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(format, row).Length) : 0);
@@ -120,23 +106,26 @@ namespace ConsoleTableExt
 
             strBuilder.AppendLine(divider);
 
+            if (option.IncludeRowCount == IncludeRowCountType.Bottom)
+            {
+                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+            }
             return strBuilder;
         }
 
-        private static StringBuilder ToMarkDownString(ConsoleTableBuilder builder)
-        {
-            return ToMarkDownString(builder, '|');
-        }
-
-        private static StringBuilder ToMarkDownString(ConsoleTableBuilder builder, char delimiter)
+        private static StringBuilder ToMarkDownString(ConsoleTableBuilder builder, ConsoleTableExportOption option)
         {
             var strBuilder = new StringBuilder();
+            if (option.IncludeRowCount == IncludeRowCountType.Top)
+            {
+                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+            }
 
             // find the longest column by searching each row
             var columnLengths = builder.ColumnLengths();
 
             // create the string format with padding
-            var format = builder.Format(columnLengths, delimiter);
+            var format = builder.Format(columnLengths, option.Delimiter);
 
             // find the longest formatted line
             var columnHeaders = string.Format(format, builder.Columns.ToArray());
@@ -151,23 +140,27 @@ namespace ConsoleTableExt
             strBuilder.AppendLine(divider);
             results.ForEach(row => strBuilder.AppendLine(row));
 
+            if (option.IncludeRowCount == IncludeRowCountType.Bottom)
+            {
+                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+            }
+
             return strBuilder;
         }
 
-        private static StringBuilder ToAlternativeString(ConsoleTableBuilder builder)
+        private static StringBuilder ToAlternativeString(ConsoleTableBuilder builder, ConsoleTableExportOption option)
         {
-            return ToAlternativeString(builder, '|');
-        }
-
-        private static StringBuilder ToAlternativeString(ConsoleTableBuilder builder, char delimiter)
-        {
-            var stringBuilder = new StringBuilder();
+            var strBuilder = new StringBuilder();
+            if (option.IncludeRowCount == IncludeRowCountType.Top)
+            {
+                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+            }
 
             // find the longest column by searching each row
             var columnLengths = builder.ColumnLengths();
 
             // create the string format with padding
-            var format = builder.Format(columnLengths, delimiter);
+            var format = builder.Format(columnLengths, option.Delimiter);
 
             // find the longest formatted line
             var columnHeaders = string.Format(format, builder.Columns.ToArray());
@@ -179,17 +172,21 @@ namespace ConsoleTableExt
             var divider = Regex.Replace(columnHeaders, @"[^|]", "-");
             var dividerPlus = divider.Replace("|", "+");
 
-            stringBuilder.AppendLine(dividerPlus);
-            stringBuilder.AppendLine(columnHeaders);
+            strBuilder.AppendLine(dividerPlus);
+            strBuilder.AppendLine(columnHeaders);
 
             foreach (var row in results)
             {
-                stringBuilder.AppendLine(dividerPlus);
-                stringBuilder.AppendLine(row);
+                strBuilder.AppendLine(dividerPlus);
+                strBuilder.AppendLine(row);
             }
-            stringBuilder.AppendLine(dividerPlus);
+            strBuilder.AppendLine(dividerPlus);
 
-            return stringBuilder;
+            if (option.IncludeRowCount == IncludeRowCountType.Bottom)
+            {
+                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+            }
+            return strBuilder;
         }
     }
 }

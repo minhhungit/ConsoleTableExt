@@ -82,11 +82,6 @@ namespace ConsoleTableExt
             return columnLengths;
         }
 
-        internal string Format(List<int> columnLengths)
-        {
-            return Format(columnLengths, '|');
-        }
-
         internal string Format(List<int> columnLengths, char delimiter)
         {
             var delimiterStr = delimiter == char.MinValue ? string.Empty : delimiter.ToString();
@@ -98,7 +93,7 @@ namespace ConsoleTableExt
 
         private static object GetValue<T>(object target, string column)
         {
-            return typeof(T).GetProperty(column).GetValue(target, null);
+            return typeof(T).GetProperty(column)?.GetValue(target, null);
         }
     }
 }
