@@ -93,8 +93,8 @@ namespace ConsoleTableExt
 
             for (var i = 0; i < Columns.Count; i++)
             {
-                var maxRow = Rows.Select(x => x[i]).Max(x => x.ToString().Length);
-                var lColumn = Columns[i].ToString().Length;
+                var maxRow = Rows.Select(x => x[i]).Max(x => x == null ? 0 : x.ToString().Length);
+                var lColumn = Columns[i] == null ? 0 : Columns[i].ToString().Length;
                 columnLengths.Add(maxRow >= lColumn ? maxRow : lColumn);
             }
 

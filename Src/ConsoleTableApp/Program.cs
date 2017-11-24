@@ -10,7 +10,7 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(ConsoleTableBuilder.From(new List<object[]>{ new[] { "1", "2" } , new []{"3", "4"}}).Export(new ConsoleTableExportOption{ExportFormat = ConsoleTableFormat.Alternative}).ToString());
+            Console.WriteLine(ConsoleTableBuilder.From(new List<object[]>{ new[] { "1", null } , new []{ null, "4"}}).Export(new ConsoleTableExportOption{ExportFormat = ConsoleTableFormat.Alternative}).ToString());
 
             var optionDefault = new ConsoleTableExportOption { IncludeRowCount = IncludeRowCountType.Top };
             var optionAlternative = new ConsoleTableExportOption { ExportFormat = ConsoleTableFormat.Alternative };
@@ -33,8 +33,8 @@ namespace ConsoleTableApp
             Console.Write(Environment.NewLine);
             Console.Write(result4);
 
-            var rows = Enumerable.Repeat(new Something("I am usingoject for En Framework"), 200).ToList();
-            rows.AddRange(Enumerable.Repeat(new Something("GetCustr ecognized"), 200).ToList());
+            var rows = Enumerable.Repeat(new Something(null), 200).ToList();
+            rows.AddRange(Enumerable.Repeat(new Something("GetCustr ecognized", null), 200).ToList());
             rows.AddRange(Enumerable.Repeat(new Something("Sending email  Gmail"), 200).ToList());
             rows.AddRange(Enumerable.Repeat(new Something("Be sure to use Se deprecated System.Web.Mail"), 200).ToList());
             rows = rows.OrderBy(elem => Guid.NewGuid()).ToList();
@@ -66,11 +66,11 @@ namespace ConsoleTableApp
             table.Columns.Add("Date", typeof(DateTime));
 
             // Here we add five DataRows.
-            table.Rows.Add(25, "Indocin", "David", DateTime.Now);
-            table.Rows.Add(50, "Enebrel", "Sam", DateTime.Now);
-            table.Rows.Add(10, "Hydralazine", "Christoff", DateTime.Now);
+            table.Rows.Add(null, "Indocin", "David", DateTime.Now);
+            table.Rows.Add(50, null, "Sam", DateTime.Now);
+            table.Rows.Add(10, "Hydralazine", null, DateTime.Now);
             table.Rows.Add(21, "Combivent", "Janet", DateTime.Now);
-            table.Rows.Add(100, "Dilantin", "Melanie", DateTime.Now);
+            table.Rows.Add(100, "Dilantin", "Melanie", null);
             return table;
         }
     }
@@ -82,7 +82,13 @@ namespace ConsoleTableApp
             Id = Guid.NewGuid().ToString("N");
             Name = name;
             Date = DateTime.Now;
-            System.Threading.Thread.Sleep(12);
+        }
+
+        public Something(string name, DateTime? date)
+        {
+            Id = Guid.NewGuid().ToString("N");
+            Name = name;
+            Date = date;
         }
 
         [ConsoleTableColumnAttributes(1, "Name")]
@@ -92,6 +98,6 @@ namespace ConsoleTableApp
         public string Id { get; set; }
 
         [ConsoleTableColumnAttributes(2)]
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
     }
 }
