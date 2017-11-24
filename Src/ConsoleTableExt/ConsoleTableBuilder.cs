@@ -34,6 +34,30 @@ namespace ConsoleTableExt
             return builder;
         }
 
+        public static ConsoleTableBuilder From(List<object[]> rows)
+        {
+            if (rows == null || !rows.Any())
+            {
+                throw new Exception("Invail rows");
+            }
+
+            var firstRow = rows.First();
+
+            var builder = new ConsoleTableBuilder();
+            builder.Columns = new List<object>();
+            for (int i = 0; i < firstRow.Length; i++)
+            {
+                builder.Columns.Add(firstRow[i]);
+            }
+
+            foreach (var row in rows.Skip(1))
+            {
+                builder.AddRow(row);
+            }
+
+            return builder;
+        }
+
         public static ConsoleTableBuilder From<T>(List<T> values) where T : IConsoleTableDataStore
         {
             var builder = new ConsoleTableBuilder();

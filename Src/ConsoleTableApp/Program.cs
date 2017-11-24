@@ -10,6 +10,8 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
+            Console.WriteLine(ConsoleTableBuilder.From(new List<object[]>{ new[] { "1", "2" } , new []{"3", "4"}}).Export(new ConsoleTableExportOption{ExportFormat = ConsoleTableFormat.Alternative}).ToString());
+
             var optionDefault = new ConsoleTableExportOption { IncludeRowCount = IncludeRowCountType.Top };
             var optionAlternative = new ConsoleTableExportOption { ExportFormat = ConsoleTableFormat.Alternative };
             var optionMarkDown = new ConsoleTableExportOption { ExportFormat = ConsoleTableFormat.MarkDown };
@@ -39,11 +41,12 @@ namespace ConsoleTableApp
             var x = ConsoleTableBuilder.From(rows).Export().ToString();
 
             var result5 = ConsoleTableBuilder.From(rows)
-                .AddColumn(new List<string> { "A", "B", "C" }, true)
+                .AddColumn(new List<string> {"A", "B", "C"}, true)
                 .AddRow("1", "2", "3")
                 .AddRow("11", "22", "33")
+                .AddRow(new List<object[]> {new[] {"a", "b", "c"}, new[] {"a", "a", "ccc"}})
                 .AddRow("111", "222", "333")
-                .AddColumn(new List<string> { "ColA", "ColB", "ColC" }, true)
+                .AddColumn(new List<string> {"ColA", "ColB", "ColC"}, true)
                 .Export().ToString();
 
             Console.Write(Environment.NewLine);

@@ -27,19 +27,40 @@ namespace ConsoleTableExt
             return builder;
         }
 
-        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, params object[] values)
+        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, params object[] rowValues)
         {
-            if (values == null)
-                throw new ArgumentNullException(nameof(values));
+            if (rowValues == null)
+                throw new ArgumentNullException(nameof(rowValues));
 
             if (!builder.Columns.Any())
                 throw new Exception("Please set the columns first");
 
-            if (builder.Columns.Count != values.Length)
+            if (builder.Columns.Count != rowValues.Length)
                 throw new Exception(
-                    $"The number columns in the row ({builder.Columns.Count}) does not match the values ({values.Length}");
+                    $"The number columns in the row ({builder.Columns.Count}) does not match the values ({rowValues.Length}");
 
-            builder.Rows.Add(values);
+            builder.Rows.Add(rowValues);
+
+            return builder;
+        }
+
+        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, List<object[]> rows)
+        {
+            if (rows == null)
+                throw new ArgumentNullException(nameof(rows));
+
+            if (!builder.Columns.Any())
+                throw new Exception("Please set the columns first");
+
+            for (int i = 0; i < rows.Count; i++)
+            {
+                if (builder.Columns.Count != rows[i].Length)
+                    throw new Exception(
+                        $"The number columns in the row ({builder.Columns.Count}) does not match the values ({rows[i].Length}");
+
+                builder.Rows.Add(rows[i]);
+            }
+            
 
             return builder;
         }
