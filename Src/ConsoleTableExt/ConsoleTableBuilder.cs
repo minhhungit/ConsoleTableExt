@@ -7,13 +7,17 @@ namespace ConsoleTableExt
 {
     public class ConsoleTableBuilder
     {
-        internal List<object> Columns { get; set; }
-        internal List<object[]> Rows { get; set; }
+        internal List<object> Column { get; set; }
+        internal List<List<object>> Rows { get; set; }
+        internal ConsoleTableBuilderOption Options { get; set; }
+        internal ConsoleTableBuilderFormat TableFormat { get; set; }
 
         private ConsoleTableBuilder()
         {
-            Columns = new List<object>();
-            Rows = new List<object[]>();
+            Column = new List<object>();
+            Rows = new List<List<object>>();
+            TableFormat = ConsoleTableBuilderFormat.Default;
+            Options = new ConsoleTableBuilderOption();
         }
 
         public static ConsoleTableBuilder From(DataTable dt)
@@ -24,11 +28,11 @@ namespace ConsoleTableExt
                 .Select(x => x.ColumnName)
                 .ToList();
 
-            builder.AddColumn(columnNames, true);
+            builder.Column = new List<object>(columnNames);
 
             foreach (DataRow row in dt.Rows)
             {
-                builder.AddRow(row.ItemArray);
+                builder.Rows.Add(new List<object>(row.ItemArray));
             }
 
             return builder;
@@ -41,83 +45,88 @@ namespace ConsoleTableExt
                 throw new Exception("Invail rows");
             }
 
-            var firstRow = rows.First();
-
             var builder = new ConsoleTableBuilder();
-            builder.Columns = new List<object>();
-            for (int i = 0; i < firstRow.Length; i++)
-            {
-                builder.Columns.Add(firstRow[i]);
-            }
 
-            foreach (var row in rows.Skip(1))
+            foreach (var row in rows)
             {
-                builder.AddRow(row);
+                builder.Rows.Add(new List<object>(row));
             }
 
             return builder;
         }
 
-        public static ConsoleTableBuilder From<T>(List<T> values) where T : IConsoleTableDataStore
+        public static ConsoleTableBuilder From(List<List<object>> rows)
         {
-            var builder = new ConsoleTableBuilder();
-
-            var properties = typeof(T).GetProperties();
-
-            var columnHeader = new List<KeyValuePair<int, string>>();
-            var columns = new List<string>();
-
-            foreach (var propertyInfo in properties)
+            if (rows == null || !rows.Any())
             {
-                var attr = (ConsoleTableColumnAttributes)propertyInfo.GetCustomAttributes(typeof(ConsoleTableColumnAttributes), true).FirstOrDefault();
-                if (attr != null)
-                {
-                    columns.Add(propertyInfo.Name);
-
-                    columnHeader.Add(new KeyValuePair<int, string>(attr.Order, string.IsNullOrWhiteSpace(attr.Name) ? propertyInfo.Name : attr.Name));
-                }
+                throw new Exception("Invail rows");
             }
 
-            builder.AddColumn(columnHeader.OrderBy(x => x.Key).ThenBy(x => x.Value).Select(x => x.Value).ToList(), true);
-            
-            var source = values.Select(value => columns.Select(column => GetValue<T>(value, column)));
-            foreach (var propertyValues in source)
-                builder.AddRow(propertyValues.ToArray());
+            var builder = new ConsoleTableBuilder();
+
+            foreach (var row in rows)
+            {
+                builder.Rows.Add(row);
+            }
 
             return builder;
         }
 
-        internal List<int> ColumnLengths()
+        private List<int> ColumnLengths()
         {
             var columnLengths = new List<int>();
 
-            for (var i = 0; i < Columns.Count; i++)
+            var numberOfColumns = this.Rows.Max(x => x.Count);
+
+            if (numberOfColumns < this.Column.Count)
             {
-                var maxRow = Rows.Select(x => x[i]).Max(x => x == null ? 0 : x.ToString().Length);
-                var lColumn = Columns[i] == null ? 0 : Columns[i].ToString().Length;
-                columnLengths.Add(maxRow >= lColumn ? maxRow : lColumn);
+                numberOfColumns = this.Column.Count;
+            }
+
+            for (var i = 0; i < numberOfColumns; i++)
+            {
+                var maxRow = this.Rows.Select(x => x[i])
+                    .Max(x => x == null ? 0 : x.ToString().Length);
+
+                if (this.Column.ToArray().Length > i && (this.Column[i] ?? string.Empty).ToString().Length > maxRow)
+                {
+                    maxRow = this.Column[i].ToString().Length;
+                }
+
+                columnLengths.Add(maxRow);
             }
 
             if (!columnLengths.Any())
             {
-                throw new Exception("Table has no column");
+                throw new Exception("Table has no columns");
+            }
+
+            if (this.Options.TrimColumn)
+            {
+                if (columnLengths.Any())
+                {
+                    var temp = columnLengths;
+                    for (int i = temp.Count - 1; i >= 0; i--)
+                    {
+                        if (temp[i] == 0)
+                        {
+                            columnLengths.RemoveAt(i);
+                        }
+                    }
+                }
             }
 
             return columnLengths;
         }
 
-        internal string Format(List<int> columnLengths, char delimiter)
+        internal string Format(char delimiter)
         {
+            var columnLengths = ColumnLengths();
             var delimiterStr = delimiter == char.MinValue ? string.Empty : delimiter.ToString();
-            var format = (Enumerable.Range(0, Columns.Count)
+            var format = (Enumerable.Range(0, columnLengths.Count)
                               .Select(i => " " + delimiterStr + " {" + i + ",-" + columnLengths[i] + "}")
                               .Aggregate((s, a) => s + a) + " " + delimiterStr).Trim();
             return format;
-        }
-
-        private static object GetValue<T>(object target, string column)
-        {
-            return typeof(T).GetProperty(column)?.GetValue(target, null);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 
 namespace ConsoleTableApp
 {
@@ -10,48 +9,71 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(ConsoleTableBuilder.From(new List<object[]>{ new[] { "1", null } , new []{ null, "4"}}).Export(new ConsoleTableExportOption{ExportFormat = ConsoleTableFormat.Alternative}).ToString());
+            DataTable table = new DataTable();
+            table.Columns.Add(null, typeof(int));
+            table.Columns.Add("Drug", typeof(string));
+            table.Columns.Add("Patient", typeof(string));
+            table.Columns.Add("Date", typeof(string));
 
-            var optionDefault = new ConsoleTableExportOption { IncludeRowCount = IncludeRowCountType.Top };
-            var optionAlternative = new ConsoleTableExportOption { ExportFormat = ConsoleTableFormat.Alternative };
-            var optionMarkDown = new ConsoleTableExportOption { ExportFormat = ConsoleTableFormat.MarkDown };
-            var optionMinimal = new ConsoleTableExportOption { ExportFormat = ConsoleTableFormat.Minimal, IncludeRowCount = IncludeRowCountType.Bottom };
+            DataRow row = table.NewRow();
+            row[0] = 999;
+            row[1] = "y";
+            row[2] = "str";
+            row[3] = "x";
 
-            var result0 = ConsoleTableBuilder.From(GetTable()).Export().ToString();
-            var result1 = ConsoleTableBuilder.From(GetTable()).Export(optionDefault).ToString();
-            var result2 = ConsoleTableBuilder.From(GetTable()).Export(optionAlternative).ToString();
-            var result3 = ConsoleTableBuilder.From(GetTable()).Export(optionMarkDown).ToString();
-            var result4 = ConsoleTableBuilder.From(GetTable()).Export(optionMinimal).ToString();
+            ConsoleTableBuilder
+                .From(GetTable())
+                .WithColumn(new List<string> {"1", null, null})
+                .AddRow(null, null, "3", null, "5", "6", "7")
+                .AddRow(new List<object>{ null, 1, "2" })
+                .AddRow(row)
+                .AddRow(new List<List<object>>
+                {
+                    new List<object>{"1",2,3,4},
+                    new List<object>{"x", "y", 999}
+                })
+                .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .WithOptions(new ConsoleTableBuilderOption {TrimColumn = true})
+                .ExportAndWriteLine();
 
-            Console.Write(result0);
-            Console.Write(Environment.NewLine);
-            Console.Write(result1);
-            Console.Write(Environment.NewLine);
-            Console.Write(result2);
-            Console.Write(Environment.NewLine);
-            Console.Write(result3);
-            Console.Write(Environment.NewLine);
-            Console.Write(result4);
+            ConsoleTableBuilder.From(new List<object[]>
+                {
+                    new object[] {"1", "2", 3, null},
+                    new object[] {"1", null, 2},
+                    new object[] {"122"}
+                })
+                .WithColumn(new List<string> {null, "1", null})
+                .AddColumn("helo")
+                .AddColumn("helo 1")
+                .AddColumn("helo 2")
+                .AddColumn("1","2","3","4","5")
+                .WithColumn("hello", "co", "ba")
+                .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .WithOptions(new ConsoleTableBuilderOption{TrimColumn = true})
+                .ExportAndWrite();
 
-            var rows = Enumerable.Repeat(new Something(null), 200).ToList();
-            rows.AddRange(Enumerable.Repeat(new Something("GetCustr ecognized", null), 200).ToList());
-            rows.AddRange(Enumerable.Repeat(new Something("Sending email  Gmail"), 200).ToList());
-            rows.AddRange(Enumerable.Repeat(new Something("Be sure to use Se deprecated System.Web.Mail"), 200).ToList());
-            rows = rows.OrderBy(elem => Guid.NewGuid()).ToList();
-            var x = ConsoleTableBuilder.From(rows).Export().ToString();
+            Console.WriteLine();
 
-            var result5 = ConsoleTableBuilder.From(rows)
-                .AddColumn(new List<string> {"A", "B", "C"}, true)
-                .AddRow("1", "2", "3")
-                .AddRow("11", "22", "33")
-                .AddRow(new List<object[]> {new[] {"a", "b", "c"}, new[] {"a", "a", "ccc"}})
-                .AddRow("111", "222", "333")
-                .AddColumn(new List<string> {"ColA", "ColB", "ColC"}, true)
-                .Export().ToString();
+            ConsoleTableBuilder.From(new List<List<object>>
+                {
+                    new List<object> {"1", 2, null, 4},
+                    new List<object> {null, "luong son ba chuc", "anh dai"},
+                    new List<object> {"133 f afa faf as",}
+                })
+                .WithFormat(ConsoleTableBuilderFormat.Minimal)
+                .ExportAndWriteLine();
 
-            Console.Write(Environment.NewLine);
-            Console.Write(result5);
-            Console.Write(Environment.NewLine);
+            ConsoleTableBuilder
+                .From(new List<object[]> {new[] {"1", null}, new[] {null, "4"}})
+                .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .ExportAndWriteLine();
+
+            var builder = ConsoleTableBuilder.From(GetTable());
+            builder.Export().ToString();
+            builder.WithFormat(ConsoleTableBuilderFormat.Default).ExportAndWriteLine();
+            builder.WithFormat(ConsoleTableBuilderFormat.Alternative).ExportAndWriteLine();
+            builder.WithFormat(ConsoleTableBuilderFormat.MarkDown).ExportAndWriteLine();
+            builder.WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
 
             Console.ReadKey();
         }
@@ -60,7 +82,7 @@ namespace ConsoleTableApp
         {
             // Here we create a DataTable with four columns.
             DataTable table = new DataTable();
-            table.Columns.Add("Dosage", typeof(int));
+            table.Columns.Add(null, typeof(int));
             table.Columns.Add("Drug", typeof(string));
             table.Columns.Add("Patient", typeof(string));
             table.Columns.Add("Date", typeof(DateTime));
@@ -73,31 +95,5 @@ namespace ConsoleTableApp
             table.Rows.Add(100, "Dilantin", "Melanie", null);
             return table;
         }
-    }
-
-    public class Something : IConsoleTableDataStore
-    {
-        public Something(string name)
-        {
-            Id = Guid.NewGuid().ToString("N");
-            Name = name;
-            Date = DateTime.Now;
-        }
-
-        public Something(string name, DateTime? date)
-        {
-            Id = Guid.NewGuid().ToString("N");
-            Name = name;
-            Date = date;
-        }
-
-        [ConsoleTableColumnAttributes(1, "Name")]
-        public string Name { get; set; }
-
-        [ConsoleTableColumnAttributes(3, "Dxxxx")]
-        public string Id { get; set; }
-
-        [ConsoleTableColumnAttributes(2)]
-        public DateTime? Date { get; set; }
     }
 }

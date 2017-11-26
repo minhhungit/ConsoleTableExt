@@ -1,17 +1,21 @@
 ﻿namespace ConsoleTableExt
 {
-    public class ConsoleTableExportOption
+    public class ConsoleTableBuilderOption
     {
-        public ConsoleTableExportOption()
+        public ConsoleTableBuilderOption()
         {
-            ExportFormat = ConsoleTableFormat.Default;
             Delimiter = '|';
             IncludeRowCount = IncludeRowCountType.None;
+            TrimColumn = false;
         }
 
         public IncludeRowCountType IncludeRowCount { get; set; }
-        public ConsoleTableFormat ExportFormat { get; set; }
         public char Delimiter { get; set; }
+
+        /// <summary>
+        /// Trim empty columns on right side
+        /// </summary>
+        public bool TrimColumn { get; set; }
     }
 
     public enum IncludeRowCountType

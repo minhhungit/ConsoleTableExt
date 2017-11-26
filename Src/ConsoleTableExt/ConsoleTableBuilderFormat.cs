@@ -1,6 +1,6 @@
 namespace ConsoleTableExt
 {
-    public enum ConsoleTableFormat
+    public enum ConsoleTableBuilderFormat
     {
         Default = 0,
         MarkDown = 1,

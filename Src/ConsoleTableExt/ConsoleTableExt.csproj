@@ -42,13 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleTableExportOption.cs" />
-    <Compile Include="IConsoleTableDataStore.cs" />
+    <Compile Include="ConsoleTableBuilderOption.cs" />
     <Compile Include="ConsoleTableBuilderExtensions.cs" />
     <Compile Include="ConsoleTableBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ConsoleTableColumnAttributes.cs" />
-    <Compile Include="ConsoleTableFormat.cs" />
+    <Compile Include="ConsoleTableBuilderFormat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

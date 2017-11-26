@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,22 +9,35 @@ namespace ConsoleTableExt
 {
     public static class ConsoleTableBuilderExtensions
     {
-        public static ConsoleTableBuilder AddColumn(this ConsoleTableBuilder builder, string name)
+        public static ConsoleTableBuilder AddColumn(this ConsoleTableBuilder builder, string columnName)
         {
-            builder.Columns.Add(name);
+            builder.Column.Add(columnName);
             return builder;
         }
 
-        public static ConsoleTableBuilder AddColumn(this ConsoleTableBuilder builder, List<string> names, bool replaceOldColumns)
+        public static ConsoleTableBuilder AddColumn(this ConsoleTableBuilder builder, List<string> columnNames)
         {
-            if (replaceOldColumns)
-            {
-                builder.Columns = new List<object>();
-            }
+            builder.Column.AddRange(columnNames);
+            return builder;
+        }
 
-            foreach (var name in names)
-                builder.Columns.Add(name);
+        public static ConsoleTableBuilder AddColumn(this ConsoleTableBuilder builder, params string[] columnNames)
+        {
+            builder.Column.AddRange(new List<object>(columnNames));
+            return builder;
+        }
 
+        public static ConsoleTableBuilder WithColumn(this ConsoleTableBuilder builder, List<string> columnNames)
+        {
+            builder.Column = new List<object>();
+            builder.Column.AddRange(columnNames);
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithColumn(this ConsoleTableBuilder builder, params string[] columnNames)
+        {
+            builder.Column = new List<object>();
+            builder.Column.AddRange(new List<object>(columnNames));
             return builder;
         }
 
@@ -32,92 +46,141 @@ namespace ConsoleTableExt
             if (rowValues == null)
                 throw new ArgumentNullException(nameof(rowValues));
 
-            if (!builder.Columns.Any())
-                throw new Exception("Please set the columns first");
-
-            if (builder.Columns.Count != rowValues.Length)
-                throw new Exception(
-                    $"The number columns in the row ({builder.Columns.Count}) does not match the values ({rowValues.Length}");
-
-            builder.Rows.Add(rowValues);
+            builder.Rows.Add(new List<object>(rowValues));
 
             return builder;
         }
 
-        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, List<object[]> rows)
+        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, List<object> row)
+        {
+            if (row == null)
+                throw new ArgumentNullException(nameof(row));
+
+            builder.Rows.Add(row);
+
+            return builder;
+        }
+
+        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, List<List<object>> rows)
         {
             if (rows == null)
                 throw new ArgumentNullException(nameof(rows));
 
-            if (!builder.Columns.Any())
-                throw new Exception("Please set the columns first");
+            builder.Rows.AddRange(rows);
+            return builder;
+        }
 
-            for (int i = 0; i < rows.Count; i++)
-            {
-                if (builder.Columns.Count != rows[i].Length)
-                    throw new Exception(
-                        $"The number columns in the row ({builder.Columns.Count}) does not match the values ({rows[i].Length}");
+        public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, DataRow row)
+        {
+            if (row == null)
+                throw new ArgumentNullException(nameof(row));
 
-                builder.Rows.Add(rows[i]);
-            }
-            
+            builder.Rows.Add(new List<object>(row.ItemArray));
+            return builder;
+        }
 
+        public static ConsoleTableBuilder WithFormat(this ConsoleTableBuilder builder, ConsoleTableBuilderFormat format)
+        {
+            builder.TableFormat = format;
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithOptions(this ConsoleTableBuilder builder, ConsoleTableBuilderOption options)
+        {
+            builder.Options = options;
             return builder;
         }
 
         public static StringBuilder Export(this ConsoleTableBuilder builder)
         {
-            return builder.Export(new ConsoleTableExportOption());
-        }
-
-        public static StringBuilder Export(this ConsoleTableBuilder builder, ConsoleTableExportOption option)
-        {
-            switch (option.ExportFormat)
+            if (!builder.Rows.Any())
             {
-                case ConsoleTableFormat.Default:
-                    return ToDefaultString(builder, option);
-                case ConsoleTableFormat.Minimal:
-                    option.Delimiter = Char.MinValue;
-                    return ToMarkDownString(builder, option);
-                case ConsoleTableFormat.Alternative:
-                    return ToAlternativeString(builder, option);
-                case ConsoleTableFormat.MarkDown:
-                    return ToMarkDownString(builder, option);
+                throw new Exception("Table has no rows");
+            }
+
+            var numberOfColumns = builder.Rows.Max(x => x.Count);
+
+            if (numberOfColumns < builder.Column.Count)
+            {
+                numberOfColumns = builder.Column.Count;
+            }
+
+            for (int i = 0; i < 1; i++)
+            {
+                if (builder.Column.Count < numberOfColumns)
+                {
+                    var missCount = numberOfColumns - builder.Column.Count;
+                    for (int j = 0; j < missCount; j++)
+                    {
+                        builder.Column.Add(null);
+                    }
+                }
+            }
+
+            for (int i = 0; i < builder.Rows.Count; i++)
+            {
+                if (builder.Rows[i].Count < numberOfColumns)
+                {
+                    var missCount = numberOfColumns - builder.Rows[i].Count;
+                    for (int j = 0; j < missCount; j++)
+                    {
+                        builder.Rows[i].Add(null);
+                    }
+                }
+            }
+
+            switch (builder.TableFormat)
+            {
+                case ConsoleTableBuilderFormat.Default:
+                    return CreateTableForDefaultFormat(builder);
+                case ConsoleTableBuilderFormat.Minimal:
+                    builder.Options.Delimiter = Char.MinValue;
+                    return CreateTableForMarkdownFormat(builder);
+                case ConsoleTableBuilderFormat.Alternative:
+                    return CreateTableForAlternativeFormat(builder);
+                case ConsoleTableBuilderFormat.MarkDown:
+                    return CreateTableForMarkdownFormat(builder);
                 default:
-                    return ToDefaultString(builder, option);
+                    return CreateTableForDefaultFormat(builder);
             }
         }
 
+        public static void ExportAndWrite(this ConsoleTableBuilder builder)
+        {
+            Console.Write(builder.Export());
+        }
 
-        private static StringBuilder ToDefaultString(ConsoleTableBuilder builder, ConsoleTableExportOption option)
+        public static void ExportAndWriteLine(this ConsoleTableBuilder builder)
+        {
+            Console.WriteLine(builder.Export());
+        }
+
+        private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (option.IncludeRowCount == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowCount == IncludeRowCountType.Top)
             {
                 strBuilder.AppendLine($"Count: {builder.Rows.Count}");
             }
 
-            // find the longest column by searching each row
-            var columnLengths = builder.ColumnLengths();
-
             // create the string format with padding
-            var format = builder.Format(columnLengths, option.Delimiter);
+            var format = builder.Format(builder.Options.Delimiter);
 
             // find the longest formatted line
-            var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(format, row).Length) : 0);
-            var columnHeaders = string.Format(format, builder.Columns.ToArray());
-
-            // longest line is greater of formatted columnHeader and longest row
-            var longestLine = Math.Max(maxRowLength, columnHeaders.Length);
+            var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(format, row.ToArray()).Length) : 0);
 
             // add each row
-            var results = builder.Rows.Select(row => string.Format(format, row)).ToList();
+            var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
 
             // create the divider
-            var divider = " " + string.Join("", Enumerable.Repeat("-", longestLine - 1)) + " ";
+            var divider = string.Join("", Enumerable.Repeat("-", maxRowLength)) + " ";
 
-            strBuilder.AppendLine(divider);
-            strBuilder.AppendLine(columnHeaders);
+            // header
+            if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
+            {
+                strBuilder.AppendLine(divider);
+                strBuilder.AppendLine(string.Format(format, builder.Column.ToArray()));
+            }
 
             foreach (var row in results)
             {
@@ -127,41 +190,49 @@ namespace ConsoleTableExt
 
             strBuilder.AppendLine(divider);
 
-            if (option.IncludeRowCount == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowCount == IncludeRowCountType.Bottom)
             {
                 strBuilder.AppendLine($"Count: {builder.Rows.Count}");
             }
             return strBuilder;
         }
 
-        private static StringBuilder ToMarkDownString(ConsoleTableBuilder builder, ConsoleTableExportOption option)
+        private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (option.IncludeRowCount == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowCount == IncludeRowCountType.Top)
             {
                 strBuilder.AppendLine($"Count: {builder.Rows.Count}");
             }
 
-            // find the longest column by searching each row
-            var columnLengths = builder.ColumnLengths();
-
             // create the string format with padding
-            var format = builder.Format(columnLengths, option.Delimiter);
+            var format = builder.Format(builder.Options.Delimiter);
 
-            // find the longest formatted line
-            var columnHeaders = string.Format(format, builder.Columns.ToArray());
+            var skipFirstRow = false;
+            var columnHeaders = string.Empty;
 
-            // add each row
-            var results = builder.Rows.Select(row => string.Format(format, row)).ToList();
+            if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
+            {
+                skipFirstRow = false;
+                columnHeaders = string.Format(format, builder.Column.ToArray());
+            }
+            else
+            {
+                skipFirstRow = true;
+                columnHeaders = string.Format(format, builder.Rows.First().ToArray());
+            }
 
             // create the divider
             var divider = Regex.Replace(columnHeaders, @"[^|]", "-");
 
             strBuilder.AppendLine(columnHeaders);
             strBuilder.AppendLine(divider);
+
+            // add each row
+            var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
             results.ForEach(row => strBuilder.AppendLine(row));
 
-            if (option.IncludeRowCount == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowCount == IncludeRowCountType.Bottom)
             {
                 strBuilder.AppendLine($"Count: {builder.Rows.Count}");
             }
@@ -169,25 +240,30 @@ namespace ConsoleTableExt
             return strBuilder;
         }
 
-        private static StringBuilder ToAlternativeString(ConsoleTableBuilder builder, ConsoleTableExportOption option)
+        private static StringBuilder CreateTableForAlternativeFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (option.IncludeRowCount == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowCount == IncludeRowCountType.Top)
             {
                 strBuilder.AppendLine($"Count: {builder.Rows.Count}");
             }
 
-            // find the longest column by searching each row
-            var columnLengths = builder.ColumnLengths();
-
             // create the string format with padding
-            var format = builder.Format(columnLengths, option.Delimiter);
+            var format = builder.Format(builder.Options.Delimiter);
 
-            // find the longest formatted line
-            var columnHeaders = string.Format(format, builder.Columns.ToArray());
+            var skipFirstRow = false;
+            var columnHeaders = string.Empty;
 
-            // add each row
-            var results = builder.Rows.Select(row => string.Format(format, row)).ToList();
+            if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
+            {
+                skipFirstRow = false;
+                columnHeaders = string.Format(format, builder.Column.ToArray());
+            }
+            else
+            {
+                skipFirstRow = true;
+                columnHeaders = string.Format(format, builder.Rows.First().ToArray());
+            }
 
             // create the divider
             var divider = Regex.Replace(columnHeaders, @"[^|]", "-");
@@ -196,6 +272,9 @@ namespace ConsoleTableExt
             strBuilder.AppendLine(dividerPlus);
             strBuilder.AppendLine(columnHeaders);
 
+            // add each row
+            var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
+
             foreach (var row in results)
             {
                 strBuilder.AppendLine(dividerPlus);
@@ -203,7 +282,7 @@ namespace ConsoleTableExt
             }
             strBuilder.AppendLine(dividerPlus);
 
-            if (option.IncludeRowCount == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowCount == IncludeRowCountType.Bottom)
             {
                 strBuilder.AppendLine($"Count: {builder.Rows.Count}");
             }
