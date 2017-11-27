@@ -123,10 +123,17 @@ namespace ConsoleTableExt
         {
             var columnLengths = ColumnLengths();
             var delimiterStr = delimiter == char.MinValue ? string.Empty : delimiter.ToString();
-            var format = (Enumerable.Range(0, columnLengths.Count)
-                              .Select(i => " " + delimiterStr + " {" + i + ",-" + columnLengths[i] + "}")
-                              .Aggregate((s, a) => s + a) + " " + delimiterStr).Trim();
-            return format;
+
+            if (columnLengths.Count > 0)
+            {
+                return (Enumerable.Range(0, columnLengths.Count)
+                            .Select(i => " " + delimiterStr + " {" + i + ",-" + columnLengths[i] + "}")
+                            .Aggregate((s, a) => s + a) + " " + delimiterStr).Trim();
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
     }
 }

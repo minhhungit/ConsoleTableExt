@@ -33,7 +33,7 @@ namespace ConsoleTableApp
                     new List<object>{"x", "y", 999}
                 })
                 .WithFormat(ConsoleTableBuilderFormat.Alternative)
-                .WithOptions(new ConsoleTableBuilderOption {TrimColumn = true})
+                .WithOptions(new ConsoleTableBuilderOption {TrimColumn = false})
                 .ExportAndWriteLine();
 
             ConsoleTableBuilder.From(new List<object[]>
@@ -49,7 +49,7 @@ namespace ConsoleTableApp
                 .AddColumn("1","2","3","4","5")
                 .WithColumn("hello", "co", "ba")
                 .WithFormat(ConsoleTableBuilderFormat.Alternative)
-                .WithOptions(new ConsoleTableBuilderOption{TrimColumn = true})
+                .WithOptions(new ConsoleTableBuilderOption{TrimColumn = false })
                 .ExportAndWrite();
 
             Console.WriteLine();
@@ -66,6 +66,17 @@ namespace ConsoleTableApp
             ConsoleTableBuilder
                 .From(new List<object[]> {new[] {"1", null}, new[] {null, "4"}})
                 .WithFormat(ConsoleTableBuilderFormat.Alternative)
+                .ExportAndWriteLine();
+
+            ConsoleTableBuilder
+                .From(new List<object[]> { new object[] { null, null }, new object[] { null, null } })
+                .WithFormat(ConsoleTableBuilderFormat.Default)
+                .WithOptions(new ConsoleTableBuilderOption { TrimColumn = true })
+                .ExportAndWriteLine();
+
+            ConsoleTableBuilder
+                .From(new List<object[]> { new object[] { null, null }, new object[] { null, null } })
+                .WithFormat(ConsoleTableBuilderFormat.Default)
                 .ExportAndWriteLine();
 
             var builder = ConsoleTableBuilder.From(GetTable());

@@ -166,6 +166,11 @@ namespace ConsoleTableExt
             // create the string format with padding
             var format = builder.Format(builder.Options.Delimiter);
 
+            if (format == string.Empty)
+            {
+                return strBuilder;
+            }
+
             // find the longest formatted line
             var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(format, row.ToArray()).Length) : 0);
 
@@ -207,6 +212,11 @@ namespace ConsoleTableExt
 
             // create the string format with padding
             var format = builder.Format(builder.Options.Delimiter);
+
+            if (format == string.Empty)
+            {
+                return strBuilder;
+            }
 
             var skipFirstRow = false;
             var columnHeaders = string.Empty;
@@ -250,6 +260,11 @@ namespace ConsoleTableExt
 
             // create the string format with padding
             var format = builder.Format(builder.Options.Delimiter);
+
+            if (format == string.Empty)
+            {
+                return strBuilder;
+            }
 
             var skipFirstRow = false;
             var columnHeaders = string.Empty;
