@@ -306,9 +306,14 @@ namespace ConsoleTableExt
 
         private static ConsoleTableBuilder BuildRowInfo(ConsoleTableBuilder builder)
         {
-            if (builder.Options.RowInfoFormat.Contains("{ROW_COUNT}"))
+            if (builder.Options.RowInfoFormat.Contains(AppConstants.RowFormat.ROW_COUNT))
             {
-                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace("{ROW_COUNT}", builder.Rows.Count.ToString());
+                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace(AppConstants.RowFormat.ROW_COUNT, builder.Rows.Count.ToString());
+            }
+
+            if (builder.Options.RowInfoFormat.Contains(AppConstants.RowFormat.COLUMN_COUNT))
+            {
+                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace(AppConstants.RowFormat.COLUMN_COUNT, builder.Column.Count.ToString());
             }
 
             return builder;

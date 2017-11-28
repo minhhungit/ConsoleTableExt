@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppConstants.cs" />
     <Compile Include="ConsoleTableBuilderOption.cs" />
     <Compile Include="ConsoleTableBuilderExtensions.cs" />
     <Compile Include="ConsoleTableBuilder.cs" />
