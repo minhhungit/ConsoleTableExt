@@ -112,6 +112,10 @@ namespace ConsoleTableExt
                         {
                             columnLengths.RemoveAt(i);
                         }
+                        else
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -119,16 +123,15 @@ namespace ConsoleTableExt
             return columnLengths;
         }
 
-        internal string Format(char delimiter)
+        internal string Format(string delimiter)
         {
             var columnLengths = ColumnLengths();
-            var delimiterStr = delimiter == char.MinValue ? string.Empty : delimiter.ToString();
 
             if (columnLengths.Count > 0)
             {
                 return (Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => " " + delimiterStr + " {" + i + ",-" + columnLengths[i] + "}")
-                            .Aggregate((s, a) => s + a) + " " + delimiterStr).Trim();
+                            .Select(i => " " + delimiter + " {" + i + ",-" + columnLengths[i] + "}")
+                            .Aggregate((s, a) => s + a) + " " + delimiter).Trim();
             }
             else
             {

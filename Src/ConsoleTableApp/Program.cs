@@ -9,102 +9,82 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
-            DataTable table = new DataTable();
-            table.Columns.Add(null, typeof(int));
-            table.Columns.Add("Drug", typeof(string));
-            table.Columns.Add("Patient", typeof(string));
-            table.Columns.Add("Date", typeof(string));
+            Console.WriteLine();
+            Console.WriteLine("From [DataTable] type and Default format:");
+            var tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder.ExportAndWriteLine();
 
-            DataRow row = table.NewRow();
-            row[0] = 999;
-            row[1] = "y";
-            row[2] = "str";
-            row[3] = "x";
-
-            ConsoleTableBuilder
-                .From(GetTable())
-                .WithColumn(new List<string> {"1", null, null})
-                .AddRow(null, null, "3", null, "5", "6", "7")
-                .AddRow(new List<object>{ null, 1, "2" })
-                .AddRow(row)
-                .AddRow(new List<List<object>>
-                {
-                    new List<object>{"1",2,3,4},
-                    new List<object>{"x", "y", 999}
-                })
-                .WithFormat(ConsoleTableBuilderFormat.Alternative)
-                .WithOptions(new ConsoleTableBuilderOption {TrimColumn = false})
-                .ExportAndWriteLine();
-
-            ConsoleTableBuilder.From(new List<object[]>
-                {
-                    new object[] {"1", "2", 3, null},
-                    new object[] {"1", null, 2},
-                    new object[] {"122"}
-                })
-                .WithColumn(new List<string> {null, "1", null})
-                .AddColumn("helo")
-                .AddColumn("helo 1")
-                .AddColumn("helo 2")
-                .AddColumn("1","2","3","4","5")
-                .WithColumn("hello", "co", "ba")
-                .WithFormat(ConsoleTableBuilderFormat.Alternative)
-                .WithOptions(new ConsoleTableBuilderOption{TrimColumn = false })
-                .ExportAndWrite();
+            Console.WriteLine("From [List] type and Minimal format:");
+            tableBuilder.WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
 
             Console.WriteLine();
 
-            ConsoleTableBuilder.From(new List<List<object>>
-                {
-                    new List<object> {"1", 2, null, 4},
-                    new List<object> {null, "luong son ba chuc", "anh dai"},
-                    new List<object> {"133 f afa faf as",}
-                })
-                .WithFormat(ConsoleTableBuilderFormat.Minimal)
-                .ExportAndWriteLine();
-
-            ConsoleTableBuilder
-                .From(new List<object[]> {new[] {"1", null}, new[] {null, "4"}})
+            var listBuilder = ConsoleTableBuilder.From(SampleListData);
+            Console.WriteLine("From [List] type and Alternative format:");
+            listBuilder
                 .WithFormat(ConsoleTableBuilderFormat.Alternative)
                 .ExportAndWriteLine();
 
-            ConsoleTableBuilder
-                .From(new List<object[]> { new object[] { null, null }, new object[] { null, null } })
-                .WithFormat(ConsoleTableBuilderFormat.Default)
-                .WithOptions(new ConsoleTableBuilderOption { TrimColumn = true })
+            Console.WriteLine();
+
+            Console.WriteLine("From [List] type and MarkDown format w/ custom column name:");
+            listBuilder
+                .WithFormat(ConsoleTableBuilderFormat.MarkDown)
+                .WithColumn(new List<string>{ "N A M E" , "[Position]", "Office", "<Age>", "Something else I don't care"})
                 .ExportAndWriteLine();
 
-            ConsoleTableBuilder
-                .From(new List<object[]> { new object[] { null, null }, new object[] { null, null } })
-                .WithFormat(ConsoleTableBuilderFormat.Default)
-                .ExportAndWriteLine();
+            Console.WriteLine();
 
-            var builder = ConsoleTableBuilder.From(GetTable());
-            builder.Export().ToString();
-            builder.WithFormat(ConsoleTableBuilderFormat.Default).ExportAndWriteLine();
-            builder.WithFormat(ConsoleTableBuilderFormat.Alternative).ExportAndWriteLine();
-            builder.WithFormat(ConsoleTableBuilderFormat.MarkDown).ExportAndWriteLine();
-            builder.WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
+
+            var arrayBuilder = ConsoleTableBuilder.From(new List<object[]>
+            {
+                new object[] {"luong", "son", "ba", null, "phim", null, null, null, 2, null},
+                new object[] {"chuc", "anh", "dai", "nhac", null, null, null }
+            });
+
+            arrayBuilder
+                .AddRow(new List<object> {1, "this", "is", "new", "row", "use", "<List>", null, null, null})
+                .AddRow(new object[] {"2", "new row", "use", "array[] values", null, null})
+                .WithOptions(new ConsoleTableBuilderOption
+                {
+                    IncludeRowInfo = IncludeRowCountType.Bottom,
+                    RowInfoFormat = "\n=> This table has {ROW_COUNT} rows and [{0}] - [{1}]",
+                    RowInfoParams = new object[] {"value 1",  2},
+                    TrimColumn = true,
+                    Delimiter = "¡",
+                    DividerString = "»",
+                })
+                .WithFormat(ConsoleTableBuilderFormat.MarkDown)
+                .WithColumn(new List<string> {"THIS", "IS", "ADVANCED", "OPTIONS"})
+                .ExportAndWriteLine();
 
             Console.ReadKey();
         }
 
-        static DataTable GetTable()
+        static DataTable SampleTableData()
         {
-            // Here we create a DataTable with four columns.
             DataTable table = new DataTable();
-            table.Columns.Add(null, typeof(int));
-            table.Columns.Add("Drug", typeof(string));
-            table.Columns.Add("Patient", typeof(string));
-            table.Columns.Add("Date", typeof(DateTime));
+            table.Columns.Add("Name", typeof(string));
+            table.Columns.Add("Position", typeof(string));
+            table.Columns.Add("Office", typeof(string));
+            table.Columns.Add("Age", typeof(int));
+            table.Columns.Add("Start Date", typeof(DateTime));
 
-            // Here we add five DataRows.
-            table.Rows.Add(null, "Indocin", "David", DateTime.Now);
-            table.Rows.Add(50, null, "Sam", DateTime.Now);
-            table.Rows.Add(10, "Hydralazine", null, DateTime.Now);
-            table.Rows.Add(21, "Combivent", "Janet", DateTime.Now);
-            table.Rows.Add(100, "Dilantin", "Melanie", null);
+            table.Rows.Add("Airi Satou", "Accountant", "Tokyo", 33, new DateTime(2017, 05, 09));
+            table.Rows.Add("Angelica Ramos", "Chief Executive Officer (CEO)", "New York", 47, new DateTime(2017, 01, 12));
+            table.Rows.Add("Ashton Cox", "Junior Technical Author", "London", 46, new DateTime(2017, 04, 02));
+            table.Rows.Add("Bradley Greer", "Software Engineer", "San Francisco", 28, new DateTime(2017, 11, 15));
+
             return table;
         }
+
+        static List<List<object>> SampleListData = new List<List<object>>
+        {
+            new List<object>{ "Sakura Yamamoto", "Support Engineer", "London", 46},
+            new List<object>{ "Serge Baldwin", "Data Coordinator", "San Francisco", 28, "something else" },
+            new List<object>{ "Shad Decker", "Regional Director", "Edinburgh"},
+        };
+
+
     }
 }

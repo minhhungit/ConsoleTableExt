@@ -134,7 +134,7 @@ namespace ConsoleTableExt
                 case ConsoleTableBuilderFormat.Default:
                     return CreateTableForDefaultFormat(builder);
                 case ConsoleTableBuilderFormat.Minimal:
-                    builder.Options.Delimiter = Char.MinValue;
+                    builder.Options.Delimiter = string.Empty;
                     return CreateTableForMarkdownFormat(builder);
                 case ConsoleTableBuilderFormat.Alternative:
                     return CreateTableForAlternativeFormat(builder);
@@ -158,9 +158,9 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowCount == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Top)
             {
-                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
 
             // create the string format with padding
@@ -178,7 +178,7 @@ namespace ConsoleTableExt
             var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
 
             // create the divider
-            var divider = string.Join("", Enumerable.Repeat("-", maxRowLength)) + " ";
+            var divider = string.Join("", Enumerable.Repeat(builder.Options.DividerString, maxRowLength));
 
             // header
             if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
@@ -195,9 +195,9 @@ namespace ConsoleTableExt
 
             strBuilder.AppendLine(divider);
 
-            if (builder.Options.IncludeRowCount == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Bottom)
             {
-                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
             return strBuilder;
         }
@@ -205,9 +205,9 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowCount == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Top)
             {
-                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
 
             // create the string format with padding
@@ -233,7 +233,7 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", "-");
+            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerString);
 
             strBuilder.AppendLine(columnHeaders);
             strBuilder.AppendLine(divider);
@@ -242,9 +242,9 @@ namespace ConsoleTableExt
             var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
             results.ForEach(row => strBuilder.AppendLine(row));
 
-            if (builder.Options.IncludeRowCount == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Bottom)
             {
-                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
 
             return strBuilder;
@@ -253,9 +253,9 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForAlternativeFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowCount == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Top)
             {
-                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
 
             // create the string format with padding
@@ -281,7 +281,7 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", "-");
+            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerString);
             var dividerPlus = divider.Replace("|", "+");
 
             strBuilder.AppendLine(dividerPlus);
@@ -297,11 +297,21 @@ namespace ConsoleTableExt
             }
             strBuilder.AppendLine(dividerPlus);
 
-            if (builder.Options.IncludeRowCount == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Bottom)
             {
-                strBuilder.AppendLine($"Count: {builder.Rows.Count}");
+                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
             return strBuilder;
+        }
+
+        private static ConsoleTableBuilder BuildRowInfo(ConsoleTableBuilder builder)
+        {
+            if (builder.Options.RowInfoFormat.Contains("{ROW_COUNT}"))
+            {
+                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace("{ROW_COUNT}", builder.Rows.Count.ToString());
+            }
+
+            return builder;
         }
     }
 }
