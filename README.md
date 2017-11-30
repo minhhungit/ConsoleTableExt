@@ -14,7 +14,7 @@ ConsoleTableBuilder
    .From(SampleTableData())
    .ExportAndWriteLine();
 ```
-From [List] type and Minimal format:
+From [DataTable] type and Minimal format:
 ```csharp
 ConsoleTableBuilder
    .From(SampleTableData())
@@ -49,7 +49,7 @@ ConsoleTableBuilder.From(new List<object[]>
    .AddRow(new object[] {"2", "new row", "use", "array[] values", null, null})
    .WithOptions(new ConsoleTableBuilderOption
    {
-   	IncludeRowInfo = IncludeRowCountType.Bottom,
+   	IncludeRowInfo = IncludeRowInfoType.Bottom,
    	RowInfoFormat = "\n=> This table has {ROW_COUNT} rows and [{0}] - [{1}]",
    	RowInfoParams = new object[] {"value 1", 2},
    	TrimColumn = true,
