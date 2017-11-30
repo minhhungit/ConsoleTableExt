@@ -158,7 +158,7 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Top)
             {
                 strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
@@ -195,7 +195,7 @@ namespace ConsoleTableExt
 
             strBuilder.AppendLine(divider);
 
-            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Bottom)
             {
                 strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
@@ -205,7 +205,7 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Top)
             {
                 strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
@@ -242,7 +242,7 @@ namespace ConsoleTableExt
             var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
             results.ForEach(row => strBuilder.AppendLine(row));
 
-            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Bottom)
             {
                 strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
@@ -253,7 +253,7 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForAlternativeFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Top)
+            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Top)
             {
                 strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
@@ -297,7 +297,7 @@ namespace ConsoleTableExt
             }
             strBuilder.AppendLine(dividerPlus);
 
-            if (builder.Options.IncludeRowInfo == IncludeRowCountType.Bottom)
+            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Bottom)
             {
                 strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
             }
@@ -313,7 +313,7 @@ namespace ConsoleTableExt
 
             if (builder.Options.RowInfoFormat.Contains(AppConstants.RowFormat.COLUMN_COUNT))
             {
-                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace(AppConstants.RowFormat.COLUMN_COUNT, builder.Column.Count.ToString());
+                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace(AppConstants.RowFormat.COLUMN_COUNT, builder.GetCadidateColumnLengths().Count.ToString());
             }
 
             return builder;

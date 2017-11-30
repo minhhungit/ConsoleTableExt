@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ConsoleTableExt
+﻿namespace ConsoleTableExt
 {
     public class ConsoleTableBuilderOption
     {
@@ -9,12 +7,12 @@ namespace ConsoleTableExt
             Delimiter = "|";
             DividerString = "-";
             TrimColumn = false;
-            IncludeRowInfo = IncludeRowCountType.None;
+            IncludeRowInfo = IncludeRowInfoType.None;
             RowInfoFormat = string.Empty;
             RowInfoParams = new[] {""};
         }
 
-        public IncludeRowCountType IncludeRowInfo { get; set; }
+        public IncludeRowInfoType IncludeRowInfo { get; set; }
         public string RowInfoFormat { get; set; }
         public object[] RowInfoParams { get; set; }
 
@@ -27,7 +25,7 @@ namespace ConsoleTableExt
         public bool TrimColumn { get; set; }
     }
 
-    public enum IncludeRowCountType
+    public enum IncludeRowInfoType
     {
         None = 0,
         Top = 1,

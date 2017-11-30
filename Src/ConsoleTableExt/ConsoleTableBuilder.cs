@@ -72,25 +72,25 @@ namespace ConsoleTableExt
             return builder;
         }
 
-        private List<int> ColumnLengths()
+        internal List<int> GetCadidateColumnLengths()
         {
             var columnLengths = new List<int>();
 
-            var numberOfColumns = this.Rows.Max(x => x.Count);
+            var numberOfColumns = Rows.Max(x => x.Count);
 
-            if (numberOfColumns < this.Column.Count)
+            if (numberOfColumns < Column.Count)
             {
-                numberOfColumns = this.Column.Count;
+                numberOfColumns = Column.Count;
             }
 
             for (var i = 0; i < numberOfColumns; i++)
             {
-                var maxRow = this.Rows.Select(x => x[i])
+                var maxRow = Rows.Select(x => x[i])
                     .Max(x => x == null ? 0 : x.ToString().Length);
 
-                if (this.Column.ToArray().Length > i && (this.Column[i] ?? string.Empty).ToString().Length > maxRow)
+                if (Column.ToArray().Length > i && (Column[i] ?? string.Empty).ToString().Length > maxRow)
                 {
-                    maxRow = this.Column[i].ToString().Length;
+                    maxRow = Column[i].ToString().Length;
                 }
 
                 columnLengths.Add(maxRow);
@@ -101,7 +101,7 @@ namespace ConsoleTableExt
                 throw new Exception("Table has no columns");
             }
 
-            if (this.Options.TrimColumn)
+            if (Options.TrimColumn)
             {
                 if (columnLengths.Any())
                 {
@@ -125,7 +125,7 @@ namespace ConsoleTableExt
 
         internal string Format(string delimiter)
         {
-            var columnLengths = ColumnLengths();
+            var columnLengths = GetCadidateColumnLengths();
 
             if (columnLengths.Count > 0)
             {

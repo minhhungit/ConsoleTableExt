@@ -47,9 +47,9 @@ namespace ConsoleTableApp
                 .AddRow(new object[] {"2", "new row", "use", "array[] values", null, null})
                 .WithOptions(new ConsoleTableBuilderOption
                 {
-                    IncludeRowInfo = IncludeRowCountType.Bottom,
-                    RowInfoFormat = "\n=> This table has {ROW_COUNT} rows and [{0}] - [{1}]",
-                    RowInfoParams = new object[] {"value 1",  2},
+                    IncludeRowInfo = IncludeRowInfoType.Bottom,
+                    RowInfoFormat = "\n=> This table has {ROW_COUNT} rows and {COLUMN_COUNT} columns\n=> [{0}] - [test value {1}]",
+                    RowInfoParams = new object[] {"test value 1",  2},
                     TrimColumn = true,
                     Delimiter = "¡",
                     DividerString = "»",
