@@ -14,7 +14,7 @@ namespace ConsoleTableApp
             var tableBuilder = ConsoleTableBuilder.From(SampleTableData());
             tableBuilder.ExportAndWriteLine();
 
-            Console.WriteLine("From [List] type and Minimal format:");
+            Console.WriteLine("From [DataTable] type and Minimal format:");
             tableBuilder.WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
 
             Console.WriteLine();
@@ -47,9 +47,15 @@ namespace ConsoleTableApp
                 .AddRow(new object[] {"2", "new row", "use", "array[] values", null, null})
                 .WithOptions(new ConsoleTableBuilderOption
                 {
-                    IncludeRowInfo = IncludeRowInfoType.Bottom,
-                    RowInfoFormat = "\n=> This table has {ROW_COUNT} rows and {COLUMN_COUNT} columns\n=> [{0}] - [test value {1}]",
-                    RowInfoParams = new object[] {"test value 1",  2},
+                    MetaRowPosition = MetaRowPosition.Bottom,
+                    MetaRowFormat = "\n=> This table has {3} rows and {2} columns\n=> [{0}] - [test value {1}]",
+                    MetaRowParams = new object[]
+                    {
+                        "test value 1",
+                        2,
+                        AppConstants.MetaRow.COLUMN_COUNT,
+                        AppConstants.MetaRow.ROW_COUNT 
+                    },
                     TrimColumn = true,
                     Delimiter = "¡",
                     DividerString = "»",

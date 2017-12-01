@@ -11,20 +11,21 @@ https://github.com/minhhungit/ConsoleTableExt/tree/master/Src/ConsoleTableApp
 From [DataTable] type and Default format:
 ```csharp
 ConsoleTableBuilder
-   .From(SampleTableData())
+   .From(GetSampleTableData())
    .ExportAndWriteLine();
 ```
 From [DataTable] type and Minimal format:
 ```csharp
 ConsoleTableBuilder
-   .From(SampleTableData())
+   .From(GetSampleTableData())
    .WithFormat(ConsoleTableBuilderFormat.Minimal)
    .ExportAndWriteLine();
 ```
+
 From [List] type and Alternative format:
 ```csharp
 ConsoleTableBuilder
-   .From(SampleListData)
+   .From(GetSampleListData())
    .WithFormat(ConsoleTableBuilderFormat.Alternative)
    .ExportAndWriteLine();
 ```
@@ -32,29 +33,38 @@ ConsoleTableBuilder
 From [List] type and MarkDown format w/ custom column name:
 ```csharp
 ConsoleTableBuilder
-   .From(SampleListData)
+   .From(GetSampleListData())
    .WithFormat(ConsoleTableBuilderFormat.MarkDown)
-   .WithColumn(new List<string>{ "N A M E" , "[Position]", "Office", "<Age>", "HELLO"})
+   .WithColumn(new List<string>{ "N A M E" , "[Position]", "Office", "<Age>", "Something else I don't care"})
    .ExportAndWriteLine();
 ```
 
 Custom:
 ```csharp
-ConsoleTableBuilder.From(new List<object[]>
-   {
-   	new object[] {"luong", "son", "ba", null, "phim", null, null, null, 2, null},
-   	new object[] {"chuc", "anh", "dai", "nhac", null, null, null}
-   })
+var arrayBuilder = ConsoleTableBuilder.From(new List<object[]>
+{
+    new object[] {"luong", "son", "ba", null, "phim", null, null, null, 2, null},
+    new object[] {"chuc", "anh", "dai", "nhac", null, null, null }
+});
+
+
+arrayBuilder
    .AddRow(new List<object> {1, "this", "is", "new", "row", "use", "<List>", null, null, null})
    .AddRow(new object[] {"2", "new row", "use", "array[] values", null, null})
    .WithOptions(new ConsoleTableBuilderOption
    {
-   	IncludeRowInfo = IncludeRowInfoType.Bottom,
-   	RowInfoFormat = "\n=> This table has {ROW_COUNT} rows and [{0}] - [{1}]",
-   	RowInfoParams = new object[] {"value 1", 2},
-   	TrimColumn = true,
-   	Delimiter = "¡",
-   	DividerString = "»",
+       MetaRowPosition = MetaRowPosition.Bottom,
+       MetaRowFormat = "\n=> This table has {3} rows and {2} columns\n=> [{0}] - [test value {1}]",
+       MetaRowParams = new object[]
+       {
+           "test value 1",
+           2,
+           AppConstants.MetaRow.COLUMN_COUNT,
+           AppConstants.MetaRow.ROW_COUNT 
+       },
+       TrimColumn = true,
+       Delimiter = "¡",
+       DividerString = "»",
    })
    .WithFormat(ConsoleTableBuilderFormat.MarkDown)
    .WithColumn(new List<string> {"THIS", "IS", "ADVANCED", "OPTIONS"})

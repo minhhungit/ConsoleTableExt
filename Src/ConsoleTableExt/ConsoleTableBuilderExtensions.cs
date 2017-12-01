@@ -158,9 +158,9 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Top)
+            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
             {
-                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
+                strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
 
             // create the string format with padding
@@ -195,9 +195,9 @@ namespace ConsoleTableExt
 
             strBuilder.AppendLine(divider);
 
-            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Bottom)
+            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
             {
-                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
+                strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
             return strBuilder;
         }
@@ -205,9 +205,9 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Top)
+            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
             {
-                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
+                strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
 
             // create the string format with padding
@@ -242,9 +242,9 @@ namespace ConsoleTableExt
             var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
             results.ForEach(row => strBuilder.AppendLine(row));
 
-            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Bottom)
+            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
             {
-                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
+                strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
 
             return strBuilder;
@@ -253,9 +253,9 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForAlternativeFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Top)
+            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
             {
-                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
+                strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
 
             // create the string format with padding
@@ -297,26 +297,28 @@ namespace ConsoleTableExt
             }
             strBuilder.AppendLine(dividerPlus);
 
-            if (builder.Options.IncludeRowInfo == IncludeRowInfoType.Bottom)
+            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
             {
-                strBuilder.AppendFormat(BuildRowInfo(builder).Options.RowInfoFormat, builder.Options.RowInfoParams);
+                strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
             return strBuilder;
         }
 
-        private static ConsoleTableBuilder BuildRowInfo(ConsoleTableBuilder builder)
+        private static string BuildMetaRowFormat(ConsoleTableBuilder builder)
         {
-            if (builder.Options.RowInfoFormat.Contains(AppConstants.RowFormat.ROW_COUNT))
+            var result = new StringBuilder().AppendFormat(builder.Options.MetaRowFormat, builder.Options.MetaRowParams).ToString();
+
+            if (result.Contains(AppConstants.MetaRow.ROW_COUNT))
             {
-                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace(AppConstants.RowFormat.ROW_COUNT, builder.Rows.Count.ToString());
+                result = result.Replace(AppConstants.MetaRow.ROW_COUNT, builder.Rows.Count.ToString());
             }
 
-            if (builder.Options.RowInfoFormat.Contains(AppConstants.RowFormat.COLUMN_COUNT))
+            if (result.Contains(AppConstants.MetaRow.COLUMN_COUNT))
             {
-                builder.Options.RowInfoFormat = builder.Options.RowInfoFormat.Replace(AppConstants.RowFormat.COLUMN_COUNT, builder.GetCadidateColumnLengths().Count.ToString());
+                result = result.Replace(AppConstants.MetaRow.COLUMN_COUNT, builder.GetCadidateColumnLengths().Count.ToString());
             }
 
-            return builder;
+            return result;
         }
     }
 }
