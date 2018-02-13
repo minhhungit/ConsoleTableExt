@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
         <Title>ConsoleTableExt</Title>
-        <Version>2.0.0</Version>
+        <Version>2.0.1</Version>
         <Copyright>Copyright 2017 minhhungit</Copyright>
         <Description>A fluent library to print out a nicely formatted table in a console application C#</Description>
         <Authors>Hung Vo</Authors>
@@ -10,16 +10,10 @@
         <PackageProjectUrl>https://github.com/minhhungit/ConsoleTableExt/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/minhhungit/ConsoleTableExt/</RepositoryUrl>
         <PackageTags>console text-table fluent console-table</PackageTags>
-        <PackageReleaseNotes>migrated ConsoleTableExt to .netstandard 2.0</PackageReleaseNotes>
-        <AssemblyVersion>2.0.0</AssemblyVersion>
-        <FileVersion>2.0.0</FileVersion>
+        <PackageReleaseNotes>support for .net 4.5</PackageReleaseNotes>
+        <AssemblyVersion>2.0.1</AssemblyVersion>
+        <FileVersion>2.0.1</FileVersion>
         <Company />
         <PackageIconUrl>https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/icon.ico</PackageIconUrl>
     </PropertyGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net452'">
-        <Reference Include="System.Net.Http" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Properties\" />
-	</ItemGroup>
 </Project>
