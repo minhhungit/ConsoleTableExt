@@ -12,3 +12,7 @@
 /.vs/ConsoleTableExtSolution/v15
 /Src/ConsoleTableApp/bin/Debug
 /Src/ConsoleTableApp/obj/Debug
+/Src/ConsoleTableExt/obj
+/Src/ConsoleTableApp/bin/Release
+/Src/ConsoleTableApp/obj/Release
+/Src/ConsoleTableExt/bin/Release
