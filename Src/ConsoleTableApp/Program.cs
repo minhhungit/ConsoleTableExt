@@ -35,9 +35,14 @@ namespace ConsoleTableApp
 
             Console.WriteLine();
 
-            Console.WriteLine("From [List<T>] type and Minimal format:");
+            Console.WriteLine("From [List<T>] (where T:class) type and Minimal format:");
             ConsoleTableBuilder.From(SampleEmployeesList).WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
             Console.WriteLine();
+
+            Console.WriteLine("From [List<T>] (where T: !class) type and Minimal format:");
+            ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 }).WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWrite();
+            Console.WriteLine();
+
 
             var arrayBuilder = ConsoleTableBuilder.From(new List<object[]>
             {

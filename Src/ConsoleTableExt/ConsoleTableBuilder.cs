@@ -42,29 +42,45 @@ namespace ConsoleTableExt
         {
             if (list == null || !list.Any())
             {
-               throw new ArgumentException($"{nameof(list)} cannot be null or empty");
+                throw new ArgumentException($"{nameof(list)} cannot be null or empty");
             }
 
             var builder = new ConsoleTableBuilder();
-
+            var isClass = typeof(T).IsClass;
             var props = list.First().GetType().GetProperties();
-            var columnNames = props.Select(p => p.Name as object).ToList();
+            List<object> columnNames;
+            if (isClass)
+            {
+                columnNames = props.Select(p => p.Name as object).ToList();
+            }
+            else
+            {
+                columnNames = new List<object> { "Value" };
+            }
+
 
             builder.Column = columnNames;
 
             foreach (var item in list)
             {
-                var itemPropValues = new List<object>();
-
-                foreach(var prop in props)
+                if (isClass == true)
                 {
-                    var objValue = prop.GetValue(item);
-                    itemPropValues.Add(objValue);
-                }
+                    var itemPropValues = new List<object>();
 
-                builder.Rows.Add(itemPropValues);
-            }            
-            
+                    foreach (var prop in props)
+                    {
+                        var objValue = prop.GetValue(item);
+                        itemPropValues.Add(objValue);
+                    }
+
+                    builder.Rows.Add(itemPropValues);
+                }
+                else
+                {
+                    builder.Rows.Add(new List<object>{item });
+                }
+            }
+
             return builder;
         }
 
@@ -72,7 +88,7 @@ namespace ConsoleTableExt
         {
             if (rows == null || !rows.Any())
             {
-               throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
+                throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
             }
 
             var builder = new ConsoleTableBuilder();
