@@ -38,11 +38,41 @@ namespace ConsoleTableExt
             return builder;
         }
 
+        public static ConsoleTableBuilder From<T>(List<T> list)
+        {
+            if (list == null || !list.Any())
+            {
+               throw new ArgumentException($"{nameof(list)} cannot be null or empty");
+            }
+
+            var builder = new ConsoleTableBuilder();
+
+            var props = list.First().GetType().GetProperties();
+            var columnNames = props.Select(p => p.Name as object).ToList();
+
+            builder.Column = columnNames;
+
+            foreach (var item in list)
+            {
+                var itemPropValues = new List<object>();
+
+                foreach(var prop in props)
+                {
+                    var objValue = prop.GetValue(item);
+                    itemPropValues.Add(objValue);
+                }
+
+                builder.Rows.Add(itemPropValues);
+            }            
+            
+            return builder;
+        }
+
         public static ConsoleTableBuilder From(List<object[]> rows)
         {
             if (rows == null || !rows.Any())
             {
-                throw new Exception("Invail rows");
+               throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
             }
 
             var builder = new ConsoleTableBuilder();
@@ -59,7 +89,7 @@ namespace ConsoleTableExt
         {
             if (rows == null || !rows.Any())
             {
-                throw new Exception("Invail rows");
+                throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
             }
 
             var builder = new ConsoleTableBuilder();
