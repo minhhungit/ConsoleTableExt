@@ -39,8 +39,8 @@ namespace ConsoleTableApp
             ConsoleTableBuilder.From(SampleEmployeesList).WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
             Console.WriteLine();
 
-            Console.WriteLine("From [List<T>] (where T: !class) type and Minimal format:");
-            ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 }).WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWrite();
+            Console.WriteLine("From [List<T>] (where T: !class) type and Alternative format:");
+            ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 }).WithFormat(ConsoleTableBuilderFormat.Alternative).WithColumn("I'm a custom name, my default name is 'Value'").ExportAndWrite();
             Console.WriteLine();
 
 
