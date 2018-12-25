@@ -30,9 +30,17 @@ namespace ConsoleTableApp
             Console.WriteLine("From [List] type and MarkDown format w/ custom column name:");
             listBuilder
                 .WithFormat(ConsoleTableBuilderFormat.MarkDown)
-                .WithColumn(new List<string>{ "N A M E" , "[Position]", "Office", "<Age>", "Something else I don't care"})
+                .WithColumn(new List<string> { "N A M E", "[Position]", "Office", "<Age>", "Something else I don't care" })
                 .ExportAndWriteLine();
 
+            Console.WriteLine();
+
+            Console.WriteLine("From [List<T>] (where T:class) type and Minimal format:");
+            ConsoleTableBuilder.From(SampleEmployeesList).WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("From [List<T>] (where T: !class) type and Minimal format:");
+            ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 }).WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWrite();
             Console.WriteLine();
 
 
@@ -43,8 +51,8 @@ namespace ConsoleTableApp
             });
 
             arrayBuilder
-                .AddRow(new List<object> {1, "this", "is", "new", "row", "use", "<List>", null, null, null})
-                .AddRow(new object[] {"2", "new row", "use", "array[] values", null, null})
+                .AddRow(new List<object> { 1, "this", "is", "new", "row", "use", "<List>", null, null, null })
+                .AddRow(new object[] { "2", "new row", "use", "array[] values", null, null })
                 .WithOptions(new ConsoleTableBuilderOption
                 {
                     MetaRowPosition = MetaRowPosition.Bottom,
@@ -54,14 +62,14 @@ namespace ConsoleTableApp
                         "test value 1",
                         2,
                         AppConstants.MetaRow.COLUMN_COUNT,
-                        AppConstants.MetaRow.ROW_COUNT 
+                        AppConstants.MetaRow.ROW_COUNT
                     },
                     TrimColumn = true,
                     Delimiter = "¡",
                     DividerString = "»",
                 })
                 .WithFormat(ConsoleTableBuilderFormat.MarkDown)
-                .WithColumn(new List<string> {"THIS", "IS", "ADVANCED", "OPTIONS"})
+                .WithColumn(new List<string> { "THIS", "IS", "ADVANCED", "OPTIONS" })
                 .ExportAndWriteLine();
 
             Console.ReadKey();
@@ -92,5 +100,29 @@ namespace ConsoleTableApp
         };
 
 
+        static List<Employee> SampleEmployeesList = new List<Employee>
+        {
+            new Employee("Airi Satou", "Accountant", "Tokyo", 33, new DateTime(2017, 05, 09)),
+            new Employee("Angelica Ramos", "Chief Executive Officer (CEO)", "New York", 47, new DateTime(2017, 01, 12)),
+            new Employee("Ashton Cox", "Junior Technical Author", "London", 46, new DateTime(2017, 04, 02)),
+            new Employee("Bradley Greer", "Software Engineer", "San Francisco", 28, new DateTime(2017, 11, 15))
+        };
+
+        private class Employee
+        {
+            public Employee(string name, string position, string office, int age, DateTime startDate)
+            {
+                Name = name;
+                Position = position;
+                Office = office;
+                Age = age;
+                StartDate = startDate;
+            }
+            public string Name { get; set; }
+            public string Position { get; set; }
+            public string Office { get; set; }
+            public int Age { get; set; }
+            public DateTime StartDate { get; set; }
+        }
     }
 }
