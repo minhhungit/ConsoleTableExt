@@ -14,6 +14,6 @@
         <AssemblyVersion>2.0.2</AssemblyVersion>
         <FileVersion>2.0.2</FileVersion>
         <Company />
-        <PackageIconUrl>https://github.com/minhhungit/ConsoleTableExt/blob/master/wiki/Images/icon.ico</PackageIconUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/icon.ico</PackageIconUrl>
     </PropertyGroup>
 </Project>
