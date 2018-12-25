@@ -38,11 +38,57 @@ namespace ConsoleTableExt
             return builder;
         }
 
+        public static ConsoleTableBuilder From<T>(List<T> list)
+        {
+            if (list == null || !list.Any())
+            {
+                throw new ArgumentException($"{nameof(list)} cannot be null or empty");
+            }
+
+            var builder = new ConsoleTableBuilder();
+            var isClass = typeof(T).IsClass;
+            var props = list.First().GetType().GetProperties();
+            List<object> columnNames;
+            if (isClass)
+            {
+                columnNames = props.Select(p => p.Name as object).ToList();
+            }
+            else
+            {
+                columnNames = new List<object> { "Value" };
+            }
+
+
+            builder.Column = columnNames;
+
+            foreach (var item in list)
+            {
+                if (isClass == true)
+                {
+                    var itemPropValues = new List<object>();
+
+                    foreach (var prop in props)
+                    {
+                        var objValue = prop.GetValue(item);
+                        itemPropValues.Add(objValue);
+                    }
+
+                    builder.Rows.Add(itemPropValues);
+                }
+                else
+                {
+                    builder.Rows.Add(new List<object>{item });
+                }
+            }
+
+            return builder;
+        }
+
         public static ConsoleTableBuilder From(List<object[]> rows)
         {
             if (rows == null || !rows.Any())
             {
-                throw new Exception("Invail rows");
+                throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
             }
 
             var builder = new ConsoleTableBuilder();
@@ -59,7 +105,7 @@ namespace ConsoleTableExt
         {
             if (rows == null || !rows.Any())
             {
-                throw new Exception("Invail rows");
+                throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
             }
 
             var builder = new ConsoleTableBuilder();
