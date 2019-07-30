@@ -1,7 +1,6 @@
 # ConsoleTableExt [![Build status](https://ci.appveyor.com/api/projects/status/e4ugtobtcrjhk9p4?svg=true)](https://ci.appveyor.com/project/minhhungit/consoletableext) <a href="https://www.nuget.org/packages/ConsoleTableExt/"><img src="https://img.shields.io/nuget/v/ConsoleTableExt.svg?style=flat" /></a>
 
-A library to print out a nicely formatted table in a console application C# rewrite based on <a href="https://github.com/khalidabuhakmeh/ConsoleTables">khalidabuhakmeh/ConsoleTables</a>
-
+A library to print out a nicely formatted table in a console application C#
 
 ### Nuget
 > Install-Package ConsoleTableExt
@@ -100,3 +99,6 @@ static List<List<object>> SampleListData = new List<List<object>>
    new List<object>{ "Shad Decker", "Regional Director", "Edinburgh"},
 };
 ```
+
+### Inspired by 
+- <a href="https://github.com/khalidabuhakmeh/ConsoleTables">khalidabuhakmeh/ConsoleTables</a>
