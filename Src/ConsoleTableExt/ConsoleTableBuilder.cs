@@ -27,9 +27,12 @@ namespace ConsoleTableExt
             var columnNames = dt.Columns.Cast<DataColumn>()
                 .Select(x => x.ColumnName)
                 .ToList();
+#if NET35
+            columnNames.ForEach(f => builder.Column.Add(f));
+#else
 
             builder.Column = new List<object>(columnNames);
-
+#endif
             foreach (DataRow row in dt.Rows)
             {
                 builder.Rows.Add(new List<object>(row.ItemArray));
@@ -69,7 +72,11 @@ namespace ConsoleTableExt
 
                     foreach (var prop in props)
                     {
+#if NET35
+                        var objValue = prop.GetValue(item, new object[]{ });
+#else 
                         var objValue = prop.GetValue(item);
+#endif
                         itemPropValues.Add(objValue);
                     }
 

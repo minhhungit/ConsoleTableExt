@@ -17,7 +17,11 @@ namespace ConsoleTableExt
 
         public static ConsoleTableBuilder AddColumn(this ConsoleTableBuilder builder, List<string> columnNames)
         {
+#if NET35
+            columnNames.ForEach(f => builder.Column.Add(f));
+#else
             builder.Column.AddRange(columnNames);
+#endif
             return builder;
         }
 
@@ -30,7 +34,11 @@ namespace ConsoleTableExt
         public static ConsoleTableBuilder WithColumn(this ConsoleTableBuilder builder, List<string> columnNames)
         {
             builder.Column = new List<object>();
+#if NET35
+            columnNames.ForEach(f => builder.Column.Add(f));
+#else
             builder.Column.AddRange(columnNames);
+#endif
             return builder;
         }
 
@@ -178,7 +186,7 @@ namespace ConsoleTableExt
             var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
 
             // create the divider
-            var divider = string.Join("", Enumerable.Repeat(builder.Options.DividerString, maxRowLength));
+            var divider = string.Join("", Enumerable.Repeat(builder.Options.DividerString, maxRowLength).ToArray());
 
             // header
             if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
