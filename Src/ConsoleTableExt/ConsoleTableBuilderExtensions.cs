@@ -186,7 +186,7 @@ namespace ConsoleTableExt
             var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
 
             // create the divider
-            var divider = string.Join("", Enumerable.Repeat(builder.Options.DividerString, maxRowLength).ToArray());
+            var divider = string.Join("", Enumerable.Repeat(builder.Options.DividerChar, maxRowLength).ToArray());
 
             // header
             if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
@@ -241,7 +241,7 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerString);
+            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerChar);
 
             strBuilder.AppendLine(columnHeaders);
             strBuilder.AppendLine(divider);
@@ -289,7 +289,7 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerString);
+            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerChar);
             var dividerPlus = divider.Replace("|", "+");
 
             strBuilder.AppendLine(dividerPlus);

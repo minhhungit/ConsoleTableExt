@@ -66,7 +66,7 @@ namespace ConsoleTableApp
                     },
                     TrimColumn = true,
                     Delimiter = "¡",
-                    DividerString = "»",
+                    DividerChar = "»",
                 })
                 .WithFormat(ConsoleTableBuilderFormat.MarkDown)
                 .WithColumn(new List<string> { "THIS", "IS", "ADVANCED", "OPTIONS" })
