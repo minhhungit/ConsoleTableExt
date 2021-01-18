@@ -15,5 +15,8 @@
         <FileVersion>2.0.3</FileVersion>
         <Company />
         <PackageIconUrl>https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/icon.ico</PackageIconUrl>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>strongname.snk</AssemblyOriginatorKeyFile>
+        <DelaySign>false</DelaySign>
     </PropertyGroup>
 </Project>
