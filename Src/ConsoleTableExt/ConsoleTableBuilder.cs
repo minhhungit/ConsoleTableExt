@@ -176,7 +176,7 @@ namespace ConsoleTableExt
             return columnLengths;
         }
 
-        internal string Format(string delimiter)
+        internal string Format(char delimiter)
         {
             var columnLengths = GetCadidateColumnLengths();
 

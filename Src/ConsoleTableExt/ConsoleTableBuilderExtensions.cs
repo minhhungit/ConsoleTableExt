@@ -142,7 +142,7 @@ namespace ConsoleTableExt
                 case ConsoleTableBuilderFormat.Default:
                     return CreateTableForDefaultFormat(builder);
                 case ConsoleTableBuilderFormat.Minimal:
-                    builder.Options.Delimiter = string.Empty;
+                    builder.Options.Delimiter = '\0';
                     return CreateTableForMarkdownFormat(builder);
                 case ConsoleTableBuilderFormat.Alternative:
                     return CreateTableForAlternativeFormat(builder);
@@ -166,7 +166,7 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
+            if (builder.Options.MetaRowPosition == ConsoleTableBuilderOption.MetaRowPositions.Top)
             {
                 strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
@@ -186,7 +186,7 @@ namespace ConsoleTableExt
             var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
 
             // create the divider
-            var divider = string.Join("", Enumerable.Repeat(builder.Options.DividerChar, maxRowLength).ToArray());
+            var divider = new string(builder.Options.DividerChar, maxRowLength);
 
             // header
             if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
@@ -203,7 +203,7 @@ namespace ConsoleTableExt
 
             strBuilder.AppendLine(divider);
 
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
+            if (builder.Options.MetaRowPosition == ConsoleTableBuilderOption.MetaRowPositions.Bottom)
             {
                 strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
@@ -213,7 +213,7 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
+            if (builder.Options.MetaRowPosition == ConsoleTableBuilderOption.MetaRowPositions.Top)
             {
                 strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
@@ -241,7 +241,7 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerChar);
+            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerChar.ToString());
 
             strBuilder.AppendLine(columnHeaders);
             strBuilder.AppendLine(divider);
@@ -250,7 +250,7 @@ namespace ConsoleTableExt
             var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
             results.ForEach(row => strBuilder.AppendLine(row));
 
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
+            if (builder.Options.MetaRowPosition == ConsoleTableBuilderOption.MetaRowPositions.Bottom)
             {
                 strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
@@ -261,7 +261,7 @@ namespace ConsoleTableExt
         private static StringBuilder CreateTableForAlternativeFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
+            if (builder.Options.MetaRowPosition == ConsoleTableBuilderOption.MetaRowPositions.Top)
             {
                 strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
@@ -289,7 +289,7 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerChar);
+            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerChar.ToString());
             var dividerPlus = divider.Replace("|", "+");
 
             strBuilder.AppendLine(dividerPlus);
@@ -305,7 +305,7 @@ namespace ConsoleTableExt
             }
             strBuilder.AppendLine(dividerPlus);
 
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
+            if (builder.Options.MetaRowPosition == ConsoleTableBuilderOption.MetaRowPositions.Bottom)
             {
                 strBuilder.AppendLine(BuildMetaRowFormat(builder));
             }
