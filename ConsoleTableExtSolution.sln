@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wiki", "wiki", "{5F169F33-1
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolteTableExtTests", "Src\ConsolteTableExtTests\ConsolteTableExtTests.csproj", "{C3514836-B59E-43C2-9E64-7F7D7A2D8DA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTableExtTests", "Src\ConsoleTableExtTests\ConsoleTableExtTests.csproj", "{C3514836-B59E-43C2-9E64-7F7D7A2D8DA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
