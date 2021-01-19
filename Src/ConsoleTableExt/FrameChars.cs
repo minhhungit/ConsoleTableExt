@@ -2,7 +2,7 @@
 
 namespace ConsoleTableExt
 {
-    public class FrameChars
+    internal class FrameChars
     {
         #region Pipes
         /// <summary>
