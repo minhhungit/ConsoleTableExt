@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleTableExt", "Src\ConsoleTableExt\ConsoleTableExt.csproj", "{AB7BC904-D18D-4033-9625-E80877D2F94E}"
 EndProject
@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wiki", "wiki", "{5F169F33-1
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolteTableExtTests", "Src\ConsolteTableExtTests\ConsolteTableExtTests.csproj", "{C3514836-B59E-43C2-9E64-7F7D7A2D8DA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,10 @@ Global
 		{C6D28DB6-CDA1-470D-97C2-1A75279BD185}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6D28DB6-CDA1-470D-97C2-1A75279BD185}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6D28DB6-CDA1-470D-97C2-1A75279BD185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3514836-B59E-43C2-9E64-7F7D7A2D8DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3514836-B59E-43C2-9E64-7F7D7A2D8DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3514836-B59E-43C2-9E64-7F7D7A2D8DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3514836-B59E-43C2-9E64-7F7D7A2D8DA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
