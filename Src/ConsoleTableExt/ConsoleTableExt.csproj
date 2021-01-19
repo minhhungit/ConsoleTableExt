@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net45;net35</TargetFrameworks>
         <Title>ConsoleTableExt</Title>
-        <Version>2.0.3</Version>
+        <Version>2.1.0</Version>
         <Copyright>Copyright 2017 minhhungit</Copyright>
         <Description>A fluent library to print out a nicely formatted table in a console application C#</Description>
         <Authors>Hung Vo</Authors>
@@ -11,8 +11,8 @@
         <RepositoryUrl>https://github.com/minhhungit/ConsoleTableExt/</RepositoryUrl>
         <PackageTags>console text-table fluent console-table</PackageTags>
         <PackageReleaseNotes>support .net framework 3.5 (thanks maikebing)</PackageReleaseNotes>
-        <AssemblyVersion>2.0.3</AssemblyVersion>
-        <FileVersion>2.0.3</FileVersion>
+        <AssemblyVersion>2.1.0</AssemblyVersion>
+        <FileVersion>2.1.0</FileVersion>
         <Company />
         <PackageIconUrl>https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/icon.ico</PackageIconUrl>
         <SignAssembly>true</SignAssembly>

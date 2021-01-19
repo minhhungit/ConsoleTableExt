@@ -13,6 +13,7 @@
         /// </summary>
         public bool TrimColumn { get; set; }
         public FrameStyles FrameStyle { get; set; } = 0;
+        public bool FrameStyleInnerDelimiterEqualsOuter { get; set; }
         #endregion
 
         #region Enums

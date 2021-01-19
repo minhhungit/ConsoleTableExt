@@ -167,26 +167,30 @@ namespace ConsoleTableExt
         #region Framing (Not like in the Media)
         private static string[] GetVars(ConsoleTableBuilder builder, int maxRowLength)
         {
+            string beginTable = null;
             string divider = null;
             string endTable = null;
 
             switch (builder.Options.FrameStyle)
             {
                 case ConsoleTableBuilderOption.FrameStyles.None:
-                    // create the divider
+                    beginTable = new string(builder.Options.DividerChar, maxRowLength);
                     divider = new string(builder.Options.DividerChar, maxRowLength);
-                    endTable = divider;
+                    endTable = new string(builder.Options.DividerChar, maxRowLength);
                     break;
                 case ConsoleTableBuilderOption.FrameStyles.Pipe:
+                    beginTable = FrameChars.BoxSE + new string(FrameChars.BoxHorizontal, maxRowLength - 2) + FrameChars.BoxSW;
+                    divider = FrameChars.BoxVerticaltoRight + new string(FrameChars.BoxHorizontal, maxRowLength - 2) + FrameChars.BoxVerticaltoLeft;
+                    endTable = FrameChars.BoxNE + new string(FrameChars.BoxHorizontal, maxRowLength - 2) + FrameChars.BoxNW;
                     break;
                 case ConsoleTableBuilderOption.FrameStyles.DoublePipe:
-                    // create the divider
-                    divider = FrameChars.PipeSE + new string(builder.Options.DividerChar, maxRowLength - 2) + FrameChars.PipeSW;
-                    endTable = FrameChars.PipeNE + new string(builder.Options.DividerChar, maxRowLength - 2) + FrameChars.PipeNW;
+                    beginTable = FrameChars.PipeSE + new string(FrameChars.PipeHorizontal, maxRowLength - 2) + FrameChars.PipeSW;
+                    divider = FrameChars.PipeVerticaltoRight + new string(FrameChars.PipeHorizontal, maxRowLength - 2) + FrameChars.PipeVerticaltoLeft;
+                    endTable = FrameChars.PipeNE + new string(FrameChars.PipeHorizontal, maxRowLength - 2) + FrameChars.PipeNW;
                     break;
             }
 
-            return new string[] {  divider, endTable };
+            return new string[] { beginTable, divider, endTable };
         }
 
         private static char GetDelimiter(ConsoleTableBuilder builder)
@@ -199,6 +203,7 @@ namespace ConsoleTableExt
                     delimiter = builder.Options.Delimiter;
                     break;
                 case ConsoleTableBuilderOption.FrameStyles.Pipe:
+                    delimiter = FrameChars.BoxVertical;
                     break;
                 case ConsoleTableBuilderOption.FrameStyles.DoublePipe:
                     delimiter = FrameChars.PipeVertical;
@@ -220,11 +225,16 @@ namespace ConsoleTableExt
             // create the string format with padding
             char delim = GetDelimiter(builder);
 
-            var format = builder.Format(delim);
+            string format = builder.Format(delim);
 
             if (format == string.Empty)
             {
                 return strBuilder;
+            }
+
+            if (!builder.Options.FrameStyleInnerDelimiterEqualsOuter)
+            {
+                format = format.Substring(0,1) + format.Substring(1, format.Length - 2).Replace(delim,'|') + format.Substring(format.Length-1);
             }
 
             // find the longest formatted line
@@ -232,8 +242,9 @@ namespace ConsoleTableExt
 
             string[] vars = GetVars(builder, maxRowLength);
 
-            string divider = vars[0];
-            string endTable = vars[0];
+            string beginTable = vars[0];
+            string divider = vars[1];
+            string endTable = vars[2];
 
             // add each row
             var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
@@ -241,7 +252,7 @@ namespace ConsoleTableExt
             // header
             if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
             {
-                strBuilder.AppendLine(divider);
+                strBuilder.AppendLine(beginTable);
                 strBuilder.AppendLine(string.Format(format, builder.Column.ToArray()));
             }
 
@@ -259,8 +270,6 @@ namespace ConsoleTableExt
             }
             return strBuilder;
         }
-
-        
 
         private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {

@@ -50,5 +50,52 @@ namespace ConsoleTableExt
         /// </summary>
         public static char PipeHorizontalUp { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x95, 0xA9 }).ToCharArray()[0];
         #endregion
+
+        #region Boxes
+        /// <summary>
+        /// Box Vertical: │
+        /// </summary>
+        public static char BoxVertical { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0x82 }).ToCharArray()[0];
+        /// <summary>
+        /// Box Horizontal: ─
+        /// </summary>
+        public static char BoxHorizontal { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0x80 }).ToCharArray()[0];
+        /// <summary>
+        /// Box SE: ┌
+        /// </summary>
+        public static char BoxSE { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0x8C }).ToCharArray()[0];
+        /// <summary>
+        /// Box SW: ┐
+        /// </summary>
+        public static char BoxSW { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0x90 }).ToCharArray()[0];
+        /// <summary>
+        /// Box NE: └
+        /// </summary>
+        public static char BoxNE { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0x94 }).ToCharArray()[0];
+        /// <summary>
+        /// Box NW: ┘
+        /// </summary>
+        public static char BoxNW { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0x98 }).ToCharArray()[0];
+        /// <summary>
+        /// Box Vertical to Right: ├
+        /// </summary>
+        public static char BoxVerticaltoRight { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0x9C }).ToCharArray()[0];
+        /// <summary>
+        /// Box Vertical to Left: ┤
+        /// </summary>
+        public static char BoxVerticaltoLeft { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0xA4 }).ToCharArray()[0];
+        /// <summary>
+        /// Box Cross: ┼
+        /// </summary>
+        public static char BoxCross { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0xBC }).ToCharArray()[0];
+        /// <summary>
+        /// Box Horizontal Down: ┬
+        /// </summary>
+        public static char BoxHorizontalDown { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0xAC }).ToCharArray()[0];
+        /// <summary>
+        /// Box Horizental Up: ┴
+        /// </summary>
+        public static char BoxHorizontalUp { get; } = Encoding.UTF8.GetString(new byte[] { 0xE2, 0x94, 0xB4 }).ToCharArray()[0];
+        #endregion
     }
 }

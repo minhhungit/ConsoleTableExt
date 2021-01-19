@@ -55,7 +55,7 @@ namespace ConsoleTableApp
                 .AddRow(new object[] { "2", "new row", "use", "array[] values", null, null })
                 .WithOptions(new ConsoleTableBuilderOption
                 {
-                    MetaRowPosition = MetaRowPosition.Bottom,
+                    MetaRowPosition = ConsoleTableBuilderOption.MetaRowPositions.Bottom,
                     MetaRowFormat = "\n=> This table has {3} rows and {2} columns\n=> [{0}] - [test value {1}]",
                     MetaRowParams = new object[]
                     {
@@ -65,12 +65,18 @@ namespace ConsoleTableApp
                         AppConstants.MetaRow.ROW_COUNT
                     },
                     TrimColumn = true,
-                    Delimiter = "¡",
-                    DividerChar = "»",
+                    Delimiter = '¡',
+                    DividerChar = '»',
                 })
                 .WithFormat(ConsoleTableBuilderFormat.MarkDown)
                 .WithColumn(new List<string> { "THIS", "IS", "ADVANCED", "OPTIONS" })
                 .ExportAndWriteLine();
+
+            ConsoleTableBuilder.From(SampleTableData()).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.DoublePipe }).ExportAndWriteLine();
+
+            ConsoleTableBuilder.From(SampleTableData()).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.DoublePipe, FrameStyleInnerDelimiterEqualsOuter = true }).ExportAndWriteLine();
+
+            ConsoleTableBuilder.From(SampleTableData()).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.Pipe }).ExportAndWriteLine();
 
             Console.ReadKey();
         }

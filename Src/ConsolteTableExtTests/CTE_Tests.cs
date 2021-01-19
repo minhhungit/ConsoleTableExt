@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Data;
+using System.Collections.Generic;
 using NUnit.Framework;
 using ConsoleTableExt;
 using System.Text;
@@ -59,6 +61,7 @@ namespace ConsolteTableExtTests
         }
 
         [Test(Description = "Build from DataTable")]
+        [TestCase(Category = "From DataTable", Description = "Standard")]
         public void BuildFromDataTable()
         {
             StringBuilder b = ConsoleTableBuilder.From(dt).Export();
@@ -70,6 +73,7 @@ namespace ConsolteTableExtTests
         }
 
         [Test(Description = "Minimal")]
+        [TestCase(Category = "From DataTable", Description = "Minimal")]
         public void Minimal()
         {
             StringBuilder b = ConsoleTableBuilder.From(dt).WithFormat(ConsoleTableBuilderFormat.Minimal).Export();
@@ -82,18 +86,32 @@ namespace ConsolteTableExtTests
         }
 
         [Test(Description = "Frame Style -> DoublePipe")]
-        [TestCase(Category = "Frame Style", Description = "DoublePipe")]
+        [TestCase(Category = "From DataTable", Description = "DoublePipe")]
         public void FrameStyle_DoublePipe()
         {
             StringBuilder b = ConsoleTableBuilder.From(dt).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.DoublePipe }).Export();
 
             string str = b.ToString();
             string[] strSplit = b.ToString().Split('\n');
-            //Assert.AreEqual(12, strSplit.Length);
-            //Assert.AreEqual(99, strSplit[0].Trim().Length);
-            //Assert.AreEqual(new string('-', 99), strSplit[0].Trim());
+            Assert.AreEqual(12, strSplit.Length);
+            Assert.AreEqual(99, strSplit[0].Trim().Length);
+            Assert.AreEqual(FrameChars.PipeSE + new string(FrameChars.PipeHorizontal, 97) + FrameChars.PipeSW, strSplit[0].Trim());
+            Assert.AreEqual(FrameChars.PipeNE + new string(FrameChars.PipeHorizontal, 97) + FrameChars.PipeNW, strSplit[strSplit.Length-2].Trim());
+        }
 
-            Debug.Print(b.ToString());
+        [Test(Description = "Frame Style -> Pipe")]
+        [TestCase(Category = "From DataTable", Description = "Pipe")]
+        public void FrameStyle_Pipe()
+        {
+            StringBuilder b = ConsoleTableBuilder.From(dt).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.Pipe }).Export();
+
+            string str = b.ToString();
+            Debug.Print(str);
+            string[] strSplit = b.ToString().Split('\n');
+            Assert.AreEqual(12, strSplit.Length);
+            Assert.AreEqual(99, strSplit[0].Trim().Length);
+            Assert.AreEqual(FrameChars.BoxSE + new string(FrameChars.BoxHorizontal, 97) + FrameChars.BoxSW, strSplit[0].Trim());
+            Assert.AreEqual(FrameChars.BoxNE + new string(FrameChars.BoxHorizontal, 97) + FrameChars.BoxNW, strSplit[strSplit.Length - 2].Trim());
         }
 
         [TearDown]
