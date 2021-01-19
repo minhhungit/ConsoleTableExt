@@ -19,4 +19,8 @@
         <AssemblyOriginatorKeyFile>strongname.snk</AssemblyOriginatorKeyFile>
         <DelaySign>false</DelaySign>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+      <DebugType>full</DebugType>
+      <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
 </Project>

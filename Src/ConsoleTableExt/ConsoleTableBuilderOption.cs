@@ -12,6 +12,7 @@
         /// Trim empty columns on right side
         /// </summary>
         public bool TrimColumn { get; set; }
+        public FrameStyles FrameStyle { get; set; } = 0;
         #endregion
 
         #region Enums
@@ -20,6 +21,12 @@
             None = 0,
             Top = 1,
             Bottom = 2
+        }
+        public enum FrameStyles
+        {
+            None = 0,
+            Pipe,
+            DoublePipe
         }
         #endregion
 

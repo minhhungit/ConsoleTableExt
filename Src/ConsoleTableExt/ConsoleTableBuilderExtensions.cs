@@ -143,6 +143,7 @@ namespace ConsoleTableExt
                     return CreateTableForDefaultFormat(builder);
                 case ConsoleTableBuilderFormat.Minimal:
                     builder.Options.Delimiter = '\0';
+                    builder.Options.FrameStyle = 0;
                     return CreateTableForMarkdownFormat(builder);
                 case ConsoleTableBuilderFormat.Alternative:
                     return CreateTableForAlternativeFormat(builder);
@@ -163,6 +164,51 @@ namespace ConsoleTableExt
             Console.WriteLine(builder.Export());
         }
 
+        #region Framing (Not like in the Media)
+        private static string[] GetVars(ConsoleTableBuilder builder, int maxRowLength)
+        {
+            string divider = null;
+            string endTable = null;
+
+            switch (builder.Options.FrameStyle)
+            {
+                case ConsoleTableBuilderOption.FrameStyles.None:
+                    // create the divider
+                    divider = new string(builder.Options.DividerChar, maxRowLength);
+                    endTable = divider;
+                    break;
+                case ConsoleTableBuilderOption.FrameStyles.Pipe:
+                    break;
+                case ConsoleTableBuilderOption.FrameStyles.DoublePipe:
+                    // create the divider
+                    divider = FrameChars.PipeSE + new string(builder.Options.DividerChar, maxRowLength - 2) + FrameChars.PipeSW;
+                    endTable = FrameChars.PipeNE + new string(builder.Options.DividerChar, maxRowLength - 2) + FrameChars.PipeNW;
+                    break;
+            }
+
+            return new string[] {  divider, endTable };
+        }
+
+        private static char GetDelimiter(ConsoleTableBuilder builder)
+        {
+            char delimiter = '\0';
+
+            switch (builder.Options.FrameStyle)
+            {
+                case ConsoleTableBuilderOption.FrameStyles.None:
+                    delimiter = builder.Options.Delimiter;
+                    break;
+                case ConsoleTableBuilderOption.FrameStyles.Pipe:
+                    break;
+                case ConsoleTableBuilderOption.FrameStyles.DoublePipe:
+                    delimiter = FrameChars.PipeVertical;
+                    break;
+            }
+
+            return delimiter;
+        }
+        #endregion
+
         private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
@@ -172,7 +218,9 @@ namespace ConsoleTableExt
             }
 
             // create the string format with padding
-            var format = builder.Format(builder.Options.Delimiter);
+            char delim = GetDelimiter(builder);
+
+            var format = builder.Format(delim);
 
             if (format == string.Empty)
             {
@@ -182,11 +230,13 @@ namespace ConsoleTableExt
             // find the longest formatted line
             var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(format, row.ToArray()).Length) : 0);
 
+            string[] vars = GetVars(builder, maxRowLength);
+
+            string divider = vars[0];
+            string endTable = vars[0];
+
             // add each row
             var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
-
-            // create the divider
-            var divider = new string(builder.Options.DividerChar, maxRowLength);
 
             // header
             if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
@@ -201,7 +251,7 @@ namespace ConsoleTableExt
                 strBuilder.AppendLine(row);
             }
 
-            strBuilder.AppendLine(divider);
+            strBuilder.AppendLine(endTable);
 
             if (builder.Options.MetaRowPosition == ConsoleTableBuilderOption.MetaRowPositions.Bottom)
             {
@@ -209,6 +259,8 @@ namespace ConsoleTableExt
             }
             return strBuilder;
         }
+
+        
 
         private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {

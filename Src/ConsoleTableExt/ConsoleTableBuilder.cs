@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 
 namespace ConsoleTableExt
 {
@@ -178,13 +179,15 @@ namespace ConsoleTableExt
 
         internal string Format(char delimiter)
         {
+            string delim = delimiter == '\0' ? string.Empty : delimiter.ToString();
+
             var columnLengths = GetCadidateColumnLengths();
 
             if (columnLengths.Count > 0)
             {
                 return (Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => " " + delimiter + " {" + i + ",-" + columnLengths[i] + "}")
-                            .Aggregate((s, a) => s + a) + " " + delimiter).Trim();
+                            .Select(i => " " + delim + " {" + i + ",-" + columnLengths[i] + "}")
+                            .Aggregate((s, a) => s + a) + " " + delim).Trim();
             }
             else
             {
