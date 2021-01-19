@@ -8,7 +8,8 @@ A library to print out a nicely formatted table in a console application C#
 ### Demo
 https://github.com/minhhungit/ConsoleTableExt/tree/master/Src/ConsoleTableApp
 
-<img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/demo.png" style="width: 100%;" />
+![FramingDemo](wiki/Images/demo.png)
+![FramingDemo](wiki/Images/demo_frame.png)
 
 ### How to use:
 From [DataTable] type and Default format:
