@@ -72,11 +72,21 @@ namespace ConsoleTableApp
                 .WithColumn(new List<string> { "THIS", "IS", "ADVANCED", "OPTIONS" })
                 .ExportAndWriteLine();
 
+            Console.WriteLine("From [DataTable] type and FrameStyle \"DoublePipe\" format:");
             ConsoleTableBuilder.From(SampleTableData()).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.DoublePipe }).ExportAndWriteLine();
 
+            Console.WriteLine("From [DataTable] type and FrameStyle \"DoublePipe\" with inner and outer pipes format:");
             ConsoleTableBuilder.From(SampleTableData()).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.DoublePipe, FrameStyleInnerDelimiterEqualsOuter = true }).ExportAndWriteLine();
 
+            Console.WriteLine("From [DataTable] type and FrameStyle \"Pipe\" format:");
             ConsoleTableBuilder.From(SampleTableData()).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.Pipe }).ExportAndWriteLine();
+
+            Console.WriteLine("From [List] type and FrameStyle \"DoublePipe\" format:");
+            listBuilder
+                .WithFormat(ConsoleTableBuilderFormat.Default)
+                .WithColumn(new List<string> { "N A M E", "[Position]", "Office", "<Age>", "Something else I don't care" })
+                .WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.DoublePipe })
+                .ExportAndWriteLine();
 
             Console.ReadKey();
         }
