@@ -106,19 +106,12 @@ namespace ConsolteTableExtTests
             Assert.AreEqual(FrameChars.BoxNE + new string(FrameChars.BoxHorizontal, 97) + FrameChars.BoxNW, strSplit[strSplit.Length - 2].Trim());
         }
 
-        [Test(Description = "Build from DataTable")]
-        [TestCase(Category = "No Row Table", Description = "Standard")]
-        public void BuildFromEmptzDataTable()
+        [Test(Description = "Build from empty DataTable")]
+        [TestCase(Category = "Empty Table", Description = "Standard")]
+        public void BuildFromEmptyDataTable()
         {
-            StringBuilder b = ConsoleTableBuilder.From(new DataTable()).WithOptions(new ConsoleTableBuilderOption() { FrameStyle = ConsoleTableBuilderOption.FrameStyles.Pipe }).Export();
-
-            string str = b.ToString();
-            Debug.Print(str);
-            string[] strSplit = b.ToString().Split('\n');
-            Assert.AreEqual(12, strSplit.Length);
-            Assert.AreEqual(99, strSplit[0].Trim().Length);
-            Assert.AreEqual(FrameChars.BoxSE + new string(FrameChars.BoxHorizontal, 97) + FrameChars.BoxSW, strSplit[0].Trim());
-            Assert.AreEqual(FrameChars.BoxNE + new string(FrameChars.BoxHorizontal, 97) + FrameChars.BoxNW, strSplit[strSplit.Length - 2].Trim());
+            StringBuilder b = null;
+            Assert.Throws<Exception>(() => { b = ConsoleTableBuilder.From(new DataTable()).Export(); });
         }
 
         [TearDown]
