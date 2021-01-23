@@ -1,6 +1,7 @@
 ﻿using ConsoleTableExt;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 
 namespace ConsoleTableApp
@@ -10,8 +11,110 @@ namespace ConsoleTableApp
         static void Main(string[] args)
         {
             Console.WriteLine();
+            Console.WriteLine("Has Column A:");
+            var tableBuilder = ConsoleTableBuilder.From(SampleEmployeesList);
+            tableBuilder
+                .WithCharMapDefination(CharMapDefinations.FramePipDefination)
+                .ExportAndWriteLine(TableAligntment.Center);
+
+            Console.WriteLine("Has Column B:");
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder
+                .WithCharMapDefination(CharMapDefinations.FrameDoublePipDefination)
+                .ExportAndWriteLine();
+
+            Console.WriteLine("Has Column C:");
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder
+                .WithCharMapDefination(
+                    CharMapDefinations.FramePipDefination,
+                    new Dictionary<HeaderCharMapPositions, char> {
+                        {HeaderCharMapPositions.A1, '╒' },
+                        {HeaderCharMapPositions.B1, '╤' },
+                        {HeaderCharMapPositions.C1, '╕' },
+                        {HeaderCharMapPositions.A2, '╞' },
+                        {HeaderCharMapPositions.B2, '╪' },
+                        {HeaderCharMapPositions.C2, '╡' },
+                        {HeaderCharMapPositions.BorderX, '═' },
+                        {HeaderCharMapPositions.BorderY, '│' },
+                        {HeaderCharMapPositions.Divider, '│' },
+                    })
+                .ExportAndWriteLine(TableAligntment.Right);
+
+            Console.WriteLine("Has Column D:");
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder
+                .WithCharMapDefination(
+                    CharMapDefinations.FramePipDefination,
+                    new Dictionary<HeaderCharMapPositions, char> {
+                        {HeaderCharMapPositions.A1, '╒' },
+                        {HeaderCharMapPositions.B1, '═' },
+                        {HeaderCharMapPositions.C1, '╕' },
+                        {HeaderCharMapPositions.A2, '╞' },
+                        {HeaderCharMapPositions.B2, '╤' },
+                        {HeaderCharMapPositions.C2, '╡' },
+                        {HeaderCharMapPositions.BorderX, '═' },
+                        {HeaderCharMapPositions.BorderY, '│' },
+                        {HeaderCharMapPositions.Divider, '\0' },
+                    })
+                .ExportAndWriteLine();
+
+            // --------------------------
+
+            Console.WriteLine();
+            Console.WriteLine("Has NO Column A:");
+            tableBuilder = ConsoleTableBuilder.From(SampleListData);
+            tableBuilder
+                .WithCharMapDefination(CharMapDefinations.FramePipDefination)
+                .ExportAndWriteLine();
+
+            Console.WriteLine("Has NO Column B:");
+            tableBuilder = ConsoleTableBuilder.From(SampleListData);
+            tableBuilder
+                .WithCharMapDefination(CharMapDefinations.FrameDoublePipDefination)
+                .ExportAndWriteLine();
+
+            Console.WriteLine("Has NO Column C:");
+            tableBuilder = ConsoleTableBuilder.From(SampleListData);
+            tableBuilder
+                .WithCharMapDefination(
+                    CharMapDefinations.FramePipDefination,
+                    new Dictionary<HeaderCharMapPositions, char> {
+                        {HeaderCharMapPositions.A1, '╒' },
+                        {HeaderCharMapPositions.B1, '╤' },
+                        {HeaderCharMapPositions.C1, '╕' },
+                        {HeaderCharMapPositions.A2, '╞' },
+                        {HeaderCharMapPositions.B2, '╪' },
+                        {HeaderCharMapPositions.C2, '╡' },
+                        {HeaderCharMapPositions.BorderX, '═' },
+                        {HeaderCharMapPositions.BorderY, '│' },
+                        {HeaderCharMapPositions.Divider, '│' },
+                    })
+                .ExportAndWriteLine();
+
+            Console.WriteLine("Has NO Column D:");
+            tableBuilder = ConsoleTableBuilder.From(SampleListData);
+            tableBuilder
+                .WithCharMapDefination(
+                    CharMapDefinations.FramePipDefination,
+                    new Dictionary<HeaderCharMapPositions, char> {
+                        {HeaderCharMapPositions.A1, '╒' },
+                        {HeaderCharMapPositions.B1, '═' },
+                        {HeaderCharMapPositions.C1, '╕' },
+                        {HeaderCharMapPositions.A2, '╞' },
+                        {HeaderCharMapPositions.B2, '╤' },
+                        {HeaderCharMapPositions.C2, '╡' },
+                        {HeaderCharMapPositions.BorderX, '═' },
+                        {HeaderCharMapPositions.BorderY, '│' },
+                        {HeaderCharMapPositions.Divider, '\0' },
+                    })
+                .ExportAndWriteLine();
+
+            // ------------
+
+            Console.WriteLine();
             Console.WriteLine("From [DataTable] type and Default format:");
-            var tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
             tableBuilder.ExportAndWriteLine();
 
             Console.WriteLine("From [DataTable] type and Minimal format:");
@@ -43,7 +146,6 @@ namespace ConsoleTableApp
             ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 }).WithFormat(ConsoleTableBuilderFormat.Alternative).WithColumn("I'm a custom name, my default name is 'Value'").ExportAndWrite();
             Console.WriteLine();
 
-
             var arrayBuilder = ConsoleTableBuilder.From(new List<object[]>
             {
                 new object[] {"luong", "son", "ba", null, "phim", null, null, null, 2, null},
@@ -55,7 +157,7 @@ namespace ConsoleTableApp
                 .AddRow(new object[] { "2", "new row", "use", "array[] values", null, null })
                 .WithOptions(new ConsoleTableBuilderOption
                 {
-                    MetaRowPosition = MetaRowPosition.Bottom,
+                    MetaRowPosition = ConsoleTableBuilderOption.MetaRowPositions.Bottom,
                     MetaRowFormat = "\n=> This table has {3} rows and {2} columns\n=> [{0}] - [test value {1}]",
                     MetaRowParams = new object[]
                     {
@@ -65,8 +167,8 @@ namespace ConsoleTableApp
                         AppConstants.MetaRow.ROW_COUNT
                     },
                     TrimColumn = true,
-                    Delimiter = "¡",
-                    DividerString = "»",
+                    DelimiterChar = '¡',
+                    DividerChar = '»',
                 })
                 .WithFormat(ConsoleTableBuilderFormat.MarkDown)
                 .WithColumn(new List<string> { "THIS", "IS", "ADVANCED", "OPTIONS" })
@@ -118,6 +220,8 @@ namespace ConsoleTableApp
                 Age = age;
                 StartDate = startDate;
             }
+
+            [Description("N - A - M - E")]
             public string Name { get; set; }
             public string Position { get; set; }
             public string Office { get; set; }
