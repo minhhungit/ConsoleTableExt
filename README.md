@@ -100,5 +100,8 @@ static List<List<object>> SampleListData = new List<List<object>>
 };
 ```
 
+### Buy me a coffee
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I13GAGL)
+
 ### Inspired by 
 - <a href="https://github.com/khalidabuhakmeh/ConsoleTables">khalidabuhakmeh/ConsoleTables</a>
