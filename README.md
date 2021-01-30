@@ -5,11 +5,6 @@ A library to print out a nicely formatted table in a console application C#
 ### Nuget
 > Install-Package ConsoleTableExt
 
-### Demo
-https://github.com/minhhungit/ConsoleTableExt/tree/master/Src/ConsoleTableApp
-
-<img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/demo.png" style="width: 100%;" />
-
 ### How to use:
 
 ```csharp
@@ -54,7 +49,11 @@ ConsoleTableBuilder
     .ExportAndWriteLine();
 ```
 
+<img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/demo1.png" style="width: 100%;" />
+
 Check more demo here https://github.com/minhhungit/ConsoleTableExt/blob/master/Src/ConsoleTableApp/Program.cs
+
+<img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/demo.png" style="width: 100%;" />
 
 ### Char Map Definition
 
