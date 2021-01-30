@@ -9,17 +9,22 @@ namespace ConsoleTableExt
     {
         internal List<object> Column { get; set; }
         internal List<List<object>> Rows { get; set; }
-        internal ConsoleTableBuilderOption Options { get; set; }
         internal ConsoleTableBuilderFormat TableFormat { get; set; }
         internal Dictionary<CharMapPositions, char> CharMapPositions { get; set; } = null;
         internal Dictionary<HeaderCharMapPositions, char> HeaderCharMapPositions { get; set; } = null;
+        internal List<KeyValuePair<MetaRowPositions, string>> TopMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+        internal List<KeyValuePair<MetaRowPositions, string>> BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+        internal Dictionary<int, string> TextAligmentData = new Dictionary<int, string>();
+        internal Dictionary<int, int> MinLengthData = new Dictionary<int, int>();
+
+        internal bool CanTrimColumn = false;
+        internal string TableTitle = string.Empty;
 
         private ConsoleTableBuilder()
         {
             Column = new List<object>();
             Rows = new List<List<object>>();
             TableFormat = ConsoleTableBuilderFormat.Default;
-            Options = new ConsoleTableBuilderOption();
         }
 
         public static ConsoleTableBuilder From(DataTable dt)
@@ -182,8 +187,10 @@ namespace ConsoleTableExt
                 var maxRow = 0;
                 if (Rows.Any())
                 {
-                    maxRow = Rows.Select(x => x[i])
-                    .Max(x => x == null ? 0 : x.ToString().Length);
+                    maxRow = Rows
+                        .Where(x => i < x.Count)
+                        .Select(x => x[i]) // list cells of column i
+                        .Max(x => x == null ? 0 : x.ToString().Length);
                 }
 
                 if (Column.ToArray().Length > i && (Column[i] ?? string.Empty).ToString().Length > maxRow)
@@ -191,19 +198,39 @@ namespace ConsoleTableExt
                     maxRow = Column[i].ToString().Length;
                 }
 
-                columnLengths.Add(maxRow);
+                if (MinLengthData != null && MinLengthData.ContainsKey(i))
+                {
+                    columnLengths.Add(maxRow > MinLengthData[i] ? maxRow : MinLengthData[i]);
+                }
+                else
+                {
+                    columnLengths.Add(maxRow);
+                }                
             }
 
-            if (!columnLengths.Any())
-            {
-                throw new Exception("Table has no columns");
-            }
+            //if (!columnLengths.Any())
+            //{
+            //    throw new Exception("Table has no columns");
+            //}
 
-            if (Options.TrimColumn)
+            if (this.CanTrimColumn)
             {
                 if (columnLengths.Any())
                 {
                     var temp = columnLengths;
+
+                    //for (int i = 0; i < temp.Count; i++)
+                    //{
+                    //    if (temp[i] == 0)
+                    //    {
+                    //        columnLengths.RemoveAt(0);
+                    //    }
+                    //    else
+                    //    {
+                    //        break;
+                    //    }
+                    //}
+
                     for (int i = temp.Count - 1; i >= 0; i--)
                     {
                         if (temp[i] == 0)
@@ -221,6 +248,9 @@ namespace ConsoleTableExt
             return columnLengths;
         }
 
+        public long ColumnLength { get { return this.GetCadidateColumnLengths().Count; } }
+        public long RowLength { get { return this.Rows.Count; } }
+
         internal string Format(char delimiter)
         {
             string delim = delimiter == '\0' ? string.Empty : delimiter.ToString();
@@ -230,7 +260,7 @@ namespace ConsoleTableExt
             if (columnLengths.Count > 0)
             {
                 return (Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => " " + delim + " {" + i + ",-" + columnLengths[i] + "}")
+                            .Select(i => " " + delim + " {" + i + "," + (TextAligmentData == null ? "-" : (TextAligmentData.ContainsKey(i) ? TextAligmentData[i].ToString() : "-")) + columnLengths[i] + "}")
                             .Aggregate((s, a) => s + a) + " " + delim).Trim();
             }
             else

@@ -1,17 +1,20 @@
 ﻿
 namespace ConsoleTableExt
 {
+    /// <summary>
+    /// Check map here https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/CharMapPositions.png
+    /// </summary>
     public enum CharMapPositions
     {
-        A1,
-        B1,
-        C1,
-        A2,
-        B2,
-        C2,
-        A3,
-        B3,
-        C3,
+        TopLeft,
+        TopCenter,
+        TopRight,
+        MiddleLeft,
+        MiddleCenter,
+        MiddleRight,
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
         BorderX,
         BorderY,
         DividerX,
