@@ -11,94 +11,58 @@ https://github.com/minhhungit/ConsoleTableExt/tree/master/Src/ConsoleTableApp
 <img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/demo.png" style="width: 100%;" />
 
 ### How to use:
-From [DataTable] type and Default format:
-```csharp
-ConsoleTableBuilder
-   .From(GetSampleTableData())
-   .ExportAndWriteLine();
-```
-From [DataTable] type and Minimal format:
-```csharp
-ConsoleTableBuilder
-   .From(GetSampleTableData())
-   .WithFormat(ConsoleTableBuilderFormat.Minimal)
-   .ExportAndWriteLine();
-```
 
-From [List] type and Alternative format:
 ```csharp
-ConsoleTableBuilder
-   .From(GetSampleListData())
-   .WithFormat(ConsoleTableBuilderFormat.Alternative)
-   .ExportAndWriteLine();
-```
-
-From [List] type and MarkDown format w/ custom column name:
-```csharp
-ConsoleTableBuilder
-   .From(GetSampleListData())
-   .WithFormat(ConsoleTableBuilderFormat.MarkDown)
-   .WithColumn(new List<string>{ "N A M E" , "[Position]", "Office", "<Age>", "Something else I don't care"})
-   .ExportAndWriteLine();
-```
-
-Custom:
-```csharp
-var arrayBuilder = ConsoleTableBuilder.From(new List<object[]>
+var tableData = new List<List<object>>
 {
-    new object[] {"luong", "son", "ba", null, "phim", null, null, null, 2, null},
-    new object[] {"chuc", "anh", "dai", "nhac", null, null, null }
-});
-
-
-arrayBuilder
-   .AddRow(new List<object> {1, "this", "is", "new", "row", "use", "<List>", null, null, null})
-   .AddRow(new object[] {"2", "new row", "use", "array[] values", null, null})
-   .WithOptions(new ConsoleTableBuilderOption
-   {
-       MetaRowPosition = MetaRowPosition.Bottom,
-       MetaRowFormat = "\n=> This table has {3} rows and {2} columns\n=> [{0}] - [test value {1}]",
-       MetaRowParams = new object[]
-       {
-           "test value 1",
-           2,
-           AppConstants.MetaRow.COLUMN_COUNT,
-           AppConstants.MetaRow.ROW_COUNT 
-       },
-       TrimColumn = true,
-       Delimiter = "¡",
-       DividerString = "»",
-   })
-   .WithFormat(ConsoleTableBuilderFormat.MarkDown)
-   .WithColumn(new List<string> {"THIS", "IS", "ADVANCED", "OPTIONS"})
-   .ExportAndWriteLine();
-```
-Sample data:
-```csharp
-static DataTable SampleTableData()
-{
-   DataTable table = new DataTable();
-   table.Columns.Add("Name", typeof(string));
-   table.Columns.Add("Position", typeof(string));
-   table.Columns.Add("Office", typeof(string));
-   table.Columns.Add("Age", typeof(int));
-   table.Columns.Add("Start Date", typeof(DateTime));
-
-   table.Rows.Add("Airi Satou", "Accountant", "Tokyo", 33, new DateTime(2017, 05, 09));
-   table.Rows.Add("Angelica Ramos", "Chief Executive Officer (CEO)", "New York", 47, new DateTime(2017, 01, 12));
-   table.Rows.Add("Ashton Cox", "Junior Technical Author", "London", 46, new DateTime(2017, 04, 02));
-   table.Rows.Add("Bradley Greer", "Software Engineer", "San Francisco", 28, new DateTime(2017, 11, 15));
-
-   return table;
-}
-
-static List<List<object>> SampleListData = new List<List<object>>
-{
-   new List<object>{ "Sakura Yamamoto", "Support Engineer", "London", 46},
-   new List<object>{ "Serge Baldwin", "Data Coordinator", "San Francisco", 28, "something else" },
-   new List<object>{ "Shad Decker", "Regional Director", "Edinburgh"},
+    new List<object>{ "Sakura Yamamoto", "Support Engineer", "London", 46},
+    new List<object>{ "Serge Baldwin", "Data Coordinator", "San Francisco", 28, "something else" },
+    new List<object>{ "Shad Decker", "Regional Director", "Edinburgh"},
 };
+
+// Simple table
+ConsoleTableBuilder
+    .From(tableData)
+    .ExportAndWriteLine();
+
+
+// Advanced table 
+ConsoleTableBuilder
+    .From(tableData)
+    .WithTitle("CONTACTS ")
+    .WithColumn("Id", "First Name", "Sur Name")
+    .WithCharMapDefinition(new Dictionary<CharMapPositions, char> {                   
+        {CharMapPositions.BottomLeft, '=' },
+        {CharMapPositions.BottomCenter, '=' },
+        {CharMapPositions.BottomRight, '=' },
+        {CharMapPositions.BorderX, '=' },
+        {CharMapPositions.BorderY, '|' },
+        {CharMapPositions.DividerY, '|' },
+    })
+    .WithHeaderCharMapDefinition(new Dictionary<HeaderCharMapPositions, char> {
+        {HeaderCharMapPositions.TopLeft, '=' },
+        {HeaderCharMapPositions.TopCenter, '=' },
+        {HeaderCharMapPositions.TopRight, '=' },
+        {HeaderCharMapPositions.BottomLeft, '|' },
+        {HeaderCharMapPositions.BottomCenter, '-' },
+        {HeaderCharMapPositions.BottomRight, '|' },
+        {HeaderCharMapPositions.Divider, '|' },
+        {HeaderCharMapPositions.BorderXTop, '=' },
+        {HeaderCharMapPositions.BorderXBottom, '-' },
+        {HeaderCharMapPositions.BorderY, '|' },
+    })
+    .ExportAndWriteLine();
 ```
+
+Check more demo here https://github.com/minhhungit/ConsoleTableExt/blob/master/Src/ConsoleTableApp/Program.cs
+
+### Char Map Definition
+
+<img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/CharMapPositions.png" style="width: 100%;" />
+
+### Header Char Map
+
+<img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/HeaderCharMapPositions.png" style="width: 100%;" />
 
 <a href='https://ko-fi.com/I2I13GAGL' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi4.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 

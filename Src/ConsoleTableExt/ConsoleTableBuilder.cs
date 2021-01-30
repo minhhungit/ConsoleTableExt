@@ -9,20 +9,32 @@ namespace ConsoleTableExt
     {
         internal List<object> Column { get; set; }
         internal List<List<object>> Rows { get; set; }
-        internal ConsoleTableBuilderOption Options { get; set; }
         internal ConsoleTableBuilderFormat TableFormat { get; set; }
+        internal Dictionary<CharMapPositions, char> CharMapPositions { get; set; } = null;
+        internal Dictionary<HeaderCharMapPositions, char> HeaderCharMapPositions { get; set; } = null;
+        internal List<KeyValuePair<MetaRowPositions, string>> TopMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+        internal List<KeyValuePair<MetaRowPositions, string>> BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+        internal Dictionary<int, string> TextAligmentData = new Dictionary<int, string>();
+        internal Dictionary<int, int> MinLengthData = new Dictionary<int, int>();
+
+        internal bool CanTrimColumn = false;
+        internal string TableTitle = string.Empty;
 
         private ConsoleTableBuilder()
         {
             Column = new List<object>();
             Rows = new List<List<object>>();
             TableFormat = ConsoleTableBuilderFormat.Default;
-            Options = new ConsoleTableBuilderOption();
         }
 
         public static ConsoleTableBuilder From(DataTable dt)
         {
             var builder = new ConsoleTableBuilder();
+
+            if (dt == null)
+            {
+                return builder;
+            }
 
             var columnNames = dt.Columns.Cast<DataColumn>()
                 .Select(x => x.ColumnName)
@@ -43,18 +55,36 @@ namespace ConsoleTableExt
 
         public static ConsoleTableBuilder From<T>(List<T> list)
         {
-            if (list == null || !list.Any())
+            var builder = new ConsoleTableBuilder();
+            if (list == null)
             {
-                throw new ArgumentException($"{nameof(list)} cannot be null or empty");
+                return builder;
             }
 
-            var builder = new ConsoleTableBuilder();
             var isClass = typeof(T).IsClass;
-            var props = list.First().GetType().GetProperties();
+            var props = new List<System.Reflection.PropertyInfo>();
+
+            if (list.Any())
+            {
+                props = list.First().GetType().GetProperties().ToList();
+            }
+
             List<object> columnNames;
             if (isClass)
             {
-                columnNames = props.Select(p => p.Name as object).ToList();
+                columnNames = props.Select(p =>
+                {
+                    object[] attrs = p.GetCustomAttributes(true);
+                    foreach (object attr in attrs)
+                    {
+                        if (attr is System.ComponentModel.DescriptionAttribute)
+                        {
+                            return ((System.ComponentModel.DescriptionAttribute)attr).Description;
+                        }
+                    }
+
+                    return p.Name as object;
+                }).ToList() ?? new List<object>();
             }
             else
             {
@@ -74,7 +104,7 @@ namespace ConsoleTableExt
                     {
 #if NET35
                         var objValue = prop.GetValue(item, new object[]{ });
-#else 
+#else
                         var objValue = prop.GetValue(item);
 #endif
                         itemPropValues.Add(objValue);
@@ -84,7 +114,7 @@ namespace ConsoleTableExt
                 }
                 else
                 {
-                    builder.Rows.Add(new List<object>{item });
+                    builder.Rows.Add(new List<object> { item });
                 }
             }
 
@@ -93,12 +123,12 @@ namespace ConsoleTableExt
 
         public static ConsoleTableBuilder From(List<object[]> rows)
         {
-            if (rows == null || !rows.Any())
-            {
-                throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
-            }
-
             var builder = new ConsoleTableBuilder();
+
+            if (rows == null)
+            {
+                return builder;
+            }            
 
             foreach (var row in rows)
             {
@@ -110,12 +140,12 @@ namespace ConsoleTableExt
 
         public static ConsoleTableBuilder From(List<List<object>> rows)
         {
-            if (rows == null || !rows.Any())
-            {
-                throw new ArgumentException($"{nameof(rows)} cannot be null or empty");
-            }
-
             var builder = new ConsoleTableBuilder();
+
+            if (rows == null)
+            {
+                return builder;
+            }
 
             foreach (var row in rows)
             {
@@ -129,7 +159,23 @@ namespace ConsoleTableExt
         {
             var columnLengths = new List<int>();
 
-            var numberOfColumns = Rows.Max(x => x.Count);
+            var numberOfColumns = 0;
+            if (Rows.Any())
+            {
+                numberOfColumns = Rows.Max(x => x.Count);
+            }
+            else
+            {
+                if (Column != null)
+                {
+                    numberOfColumns = Column.Count;
+                }                
+            }
+
+            if (numberOfColumns == 0)
+            {
+                return new List<int>();
+            }
 
             if (numberOfColumns < Column.Count)
             {
@@ -138,27 +184,53 @@ namespace ConsoleTableExt
 
             for (var i = 0; i < numberOfColumns; i++)
             {
-                var maxRow = Rows.Select(x => x[i])
-                    .Max(x => x == null ? 0 : x.ToString().Length);
+                var maxRow = 0;
+                if (Rows.Any())
+                {
+                    maxRow = Rows
+                        .Where(x => i < x.Count)
+                        .Select(x => x[i]) // list cells of column i
+                        .Max(x => x == null ? 0 : x.ToString().Length);
+                }
 
                 if (Column.ToArray().Length > i && (Column[i] ?? string.Empty).ToString().Length > maxRow)
                 {
                     maxRow = Column[i].ToString().Length;
                 }
 
-                columnLengths.Add(maxRow);
+                if (MinLengthData != null && MinLengthData.ContainsKey(i))
+                {
+                    columnLengths.Add(maxRow > MinLengthData[i] ? maxRow : MinLengthData[i]);
+                }
+                else
+                {
+                    columnLengths.Add(maxRow);
+                }                
             }
 
-            if (!columnLengths.Any())
-            {
-                throw new Exception("Table has no columns");
-            }
+            //if (!columnLengths.Any())
+            //{
+            //    throw new Exception("Table has no columns");
+            //}
 
-            if (Options.TrimColumn)
+            if (this.CanTrimColumn)
             {
                 if (columnLengths.Any())
                 {
                     var temp = columnLengths;
+
+                    //for (int i = 0; i < temp.Count; i++)
+                    //{
+                    //    if (temp[i] == 0)
+                    //    {
+                    //        columnLengths.RemoveAt(0);
+                    //    }
+                    //    else
+                    //    {
+                    //        break;
+                    //    }
+                    //}
+
                     for (int i = temp.Count - 1; i >= 0; i--)
                     {
                         if (temp[i] == 0)
@@ -176,15 +248,38 @@ namespace ConsoleTableExt
             return columnLengths;
         }
 
-        internal string Format(string delimiter)
+        public long ColumnLength { get { return this.GetCadidateColumnLengths().Count; } }
+        public long RowLength { get { return this.Rows.Count; } }
+
+        internal string Format(char delimiter)
         {
+            string delim = delimiter == '\0' ? string.Empty : delimiter.ToString();
+
             var columnLengths = GetCadidateColumnLengths();
 
             if (columnLengths.Count > 0)
             {
                 return (Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => " " + delimiter + " {" + i + ",-" + columnLengths[i] + "}")
-                            .Aggregate((s, a) => s + a) + " " + delimiter).Trim();
+                            .Select(i => " " + delim + " {" + i + "," + (TextAligmentData == null ? "-" : (TextAligmentData.ContainsKey(i) ? TextAligmentData[i].ToString() : "-")) + columnLengths[i] + "}")
+                            .Aggregate((s, a) => s + a) + " " + delim).Trim();
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        internal string FormatWithoutContent(char delimiter)
+        {
+            string delim = delimiter == '\0' ? string.Empty : delimiter.ToString();
+
+            var columnLengths = GetCadidateColumnLengths();
+
+            if (columnLengths.Count > 0)
+            {
+                return (Enumerable.Range(0, columnLengths.Count)
+                            .Select(i => " " + delim + " " + new string(' ', columnLengths[i]))
+                            .Aggregate((s, a) => s + a) + " " + delim).Trim();
             }
             else
             {

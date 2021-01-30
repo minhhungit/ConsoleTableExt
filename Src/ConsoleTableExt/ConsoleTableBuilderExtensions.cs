@@ -52,27 +52,97 @@ namespace ConsoleTableExt
         public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, params object[] rowValues)
         {
             if (rowValues == null)
-                throw new ArgumentNullException(nameof(rowValues));
+                return builder;
 
             builder.Rows.Add(new List<object>(rowValues));
 
             return builder;
         }
 
+        public static ConsoleTableBuilder WithMetadataRow(this ConsoleTableBuilder builder, MetaRowPositions position, Func<ConsoleTableBuilder, string> contentGenerator)
+        {
+            switch (position)
+            {
+                case MetaRowPositions.Top:
+                    if (builder.TopMetadataRows == null)
+                    {
+                        builder.TopMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+                    }
+
+                    builder.TopMetadataRows.Add(new KeyValuePair<MetaRowPositions, string>(position, contentGenerator.Invoke(builder)));
+                    break;
+                case MetaRowPositions.Bottom:
+                    if (builder.BottomMetadataRows == null)
+                    {
+                        builder.BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+                    }
+
+                    builder.BottomMetadataRows.Add(new KeyValuePair<MetaRowPositions, string>(position, contentGenerator.Invoke(builder)));
+                    break;
+
+                default:
+                    break;
+            }
+
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title)
+        {
+            builder.TableTitle = title;
+            return builder;
+        }
+
+        /// <summary>
+        /// Text alignment definition
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="alignmentData"></param>
+        /// <returns></returns>
+        public static ConsoleTableBuilder WithTextAlignment(this ConsoleTableBuilder builder, Dictionary<int, TextAligntment> alignmentData)
+        {
+            if (alignmentData != null)
+            {
+                builder.TextAligmentData = new Dictionary<int, string>();
+
+                foreach (var item in alignmentData)
+                {
+                    builder.TextAligmentData.Add(item.Key, item.Value == TextAligntment.Left ? "-" : string.Empty);
+                }
+            }
+
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithMinLength(this ConsoleTableBuilder builder, Dictionary<int, int> minLengthData)
+        {
+            if (minLengthData != null)
+            {
+                builder.MinLengthData = minLengthData;
+            }
+
+            return builder;
+        }
+
+        public static ConsoleTableBuilder TrimColumn(this ConsoleTableBuilder builder, bool canTrimColumn = true)
+        {
+            builder.CanTrimColumn = canTrimColumn;
+            return builder;
+        }
+
         public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, List<object> row)
         {
             if (row == null)
-                throw new ArgumentNullException(nameof(row));
+                return builder;
 
             builder.Rows.Add(row);
-
             return builder;
         }
 
         public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, List<List<object>> rows)
         {
             if (rows == null)
-                throw new ArgumentNullException(nameof(rows));
+                return builder;
 
             builder.Rows.AddRange(rows);
             return builder;
@@ -81,7 +151,7 @@ namespace ConsoleTableExt
         public static ConsoleTableBuilder AddRow(this ConsoleTableBuilder builder, DataRow row)
         {
             if (row == null)
-                throw new ArgumentNullException(nameof(row));
+                return builder;
 
             builder.Rows.Add(new List<object>(row.ItemArray));
             return builder;
@@ -93,29 +163,60 @@ namespace ConsoleTableExt
             return builder;
         }
 
-        public static ConsoleTableBuilder WithOptions(this ConsoleTableBuilder builder, ConsoleTableBuilderOption options)
+        public static ConsoleTableBuilder WithCharMapDefinition(this ConsoleTableBuilder builder, Dictionary<CharMapPositions, char> charMapPositions)
         {
-            builder.Options = options;
+            builder.CharMapPositions = charMapPositions;
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithCharMapDefinition(this ConsoleTableBuilder builder, Dictionary<CharMapPositions, char> charMapPositions, Dictionary<HeaderCharMapPositions, char> headerCharMapPositions = null)
+        {
+            builder.CharMapPositions = charMapPositions;
+            builder.HeaderCharMapPositions = headerCharMapPositions;
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithHeaderCharMapDefinition(this ConsoleTableBuilder builder, Dictionary<HeaderCharMapPositions, char> headerCharMapPositions = null)
+        {
+            builder.HeaderCharMapPositions = headerCharMapPositions;
             return builder;
         }
 
         public static StringBuilder Export(this ConsoleTableBuilder builder)
         {
-            if (!builder.Rows.Any())
+            var numberOfColumns = 0;
+            if (builder.Rows.Any())
             {
-                throw new Exception("Table has no rows");
+                numberOfColumns = builder.Rows.Max(x => x.Count);
+            }
+            else
+            {
+                if (builder.Column != null)
+                {
+                    numberOfColumns = builder.Column.Count();
+                }                
             }
 
-            var numberOfColumns = builder.Rows.Max(x => x.Count);
-
-            if (numberOfColumns < builder.Column.Count)
+            if (numberOfColumns == 0)
             {
-                numberOfColumns = builder.Column.Count;
+                return new StringBuilder();
+            }
+
+            if (builder.Column == null)
+            {
+                numberOfColumns = 0;
+            }
+            else
+            {
+                if (numberOfColumns < builder.Column.Count)
+                {
+                    numberOfColumns = builder.Column.Count;
+                }
             }
 
             for (int i = 0; i < 1; i++)
             {
-                if (builder.Column.Count < numberOfColumns)
+                if (builder.Column != null && builder.Column.Count < numberOfColumns)
                 {
                     var missCount = numberOfColumns - builder.Column.Count;
                     for (int j = 0; j < missCount; j++)
@@ -137,42 +238,106 @@ namespace ConsoleTableExt
                 }
             }
 
-            switch (builder.TableFormat)
+            if (builder.CharMapPositions != null)
             {
-                case ConsoleTableBuilderFormat.Default:
-                    return CreateTableForDefaultFormat(builder);
-                case ConsoleTableBuilderFormat.Minimal:
-                    builder.Options.Delimiter = string.Empty;
-                    return CreateTableForMarkdownFormat(builder);
-                case ConsoleTableBuilderFormat.Alternative:
-                    return CreateTableForAlternativeFormat(builder);
-                case ConsoleTableBuilderFormat.MarkDown:
-                    return CreateTableForMarkdownFormat(builder);
-                default:
-                    return CreateTableForDefaultFormat(builder);
+                return CreateTableForCustomFormat(builder, builder.CharMapPositions, builder.HeaderCharMapPositions);
+            }
+            else
+            {
+                switch (builder.TableFormat)
+                {
+                    case ConsoleTableBuilderFormat.Default:
+                        return CreateTableForDefaultFormat(builder);
+                    case ConsoleTableBuilderFormat.Minimal:
+                        return CreateTableForMinimalFormat(builder);
+                    case ConsoleTableBuilderFormat.Alternative:
+                        return CreateTableForAlternativeFormat(builder);
+                    case ConsoleTableBuilderFormat.MarkDown:
+                        return CreateTableForMarkdownFormat(builder);
+                    default:
+                        return CreateTableForDefaultFormat(builder);
+                }
+            }
+           
+        }
+
+        public static void ExportAndWrite(this ConsoleTableBuilder builder, TableAligntment alignment = TableAligntment.Left)
+        {
+            var strBuilder = builder.Export();
+
+            if (alignment != TableAligntment.Left)
+            {
+                var lines = strBuilder.ToString().Split('\n');
+
+                var linesCount = lines.Count();
+                for (int i = 0; i < linesCount; i++)
+                {
+                    switch (alignment)
+                    {
+                        case TableAligntment.Center:
+                            if (i == linesCount - 1)
+                            {
+                                Console.Write(String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]));
+                            }
+                            else
+                            {
+                                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]));
+                            }
+                            break;
+                        case TableAligntment.Right:
+                            if (i == linesCount - 1)
+                            {
+                                Console.Write(String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]));
+                            }
+                            else
+                            {
+                                Console.WriteLine(String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]));
+                            }
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                Console.Write(strBuilder);
             }
         }
 
-        public static void ExportAndWrite(this ConsoleTableBuilder builder)
+        public static void ExportAndWriteLine(this ConsoleTableBuilder builder, TableAligntment alignment = TableAligntment.Left)
         {
-            Console.Write(builder.Export());
-        }
+            var strBuilder = builder.Export();
 
-        public static void ExportAndWriteLine(this ConsoleTableBuilder builder)
-        {
-            Console.WriteLine(builder.Export());
+            if (alignment != TableAligntment.Left)
+            {
+                var lines = strBuilder.ToString().Split('\n');
+
+                var linesCount = lines.Count();
+                for (int i = 0; i < linesCount; i++)
+                {
+                    switch (alignment)
+                    {
+                        case TableAligntment.Center:
+                            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]));
+                            break;
+                        case TableAligntment.Right:
+                            Console.WriteLine(String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]));
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine(strBuilder);
+            }
         }
 
         private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
-            {
-                strBuilder.AppendLine(BuildMetaRowFormat(builder));
-            }
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Top);
 
             // create the string format with padding
-            var format = builder.Format(builder.Options.Delimiter);
+            var format = builder.Format('|');
 
             if (format == string.Empty)
             {
@@ -186,7 +351,7 @@ namespace ConsoleTableExt
             var results = builder.Rows.Select(row => string.Format(format, row.ToArray())).ToList();
 
             // create the divider
-            var divider = string.Join("", Enumerable.Repeat(builder.Options.DividerString, maxRowLength).ToArray());
+            var divider = new string('-', maxRowLength);
 
             // header
             if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
@@ -203,23 +368,266 @@ namespace ConsoleTableExt
 
             strBuilder.AppendLine(divider);
 
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
-            {
-                strBuilder.AppendLine(BuildMetaRowFormat(builder));
-            }
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Bottom);
             return strBuilder;
         }
 
-        private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
+        private static StringBuilder CreateTableForCustomFormat(ConsoleTableBuilder builder, Dictionary<CharMapPositions, char> charMapDefinition, Dictionary<HeaderCharMapPositions, char> headerCharMapDefinition = null)
         {
+            var filledMap = FillCharMap(charMapDefinition);
+            var filledHeaderMap = FillHeaderCharMap(headerCharMapDefinition);
+
             var strBuilder = new StringBuilder();
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
-            {
-                strBuilder.AppendLine(BuildMetaRowFormat(builder));
-            }
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Top);
 
             // create the string format with padding
-            var format = builder.Format(builder.Options.Delimiter);
+            char delim = 'x';
+
+            //for example: | {0,-14} | {1,-29} | {2,-13} | {3,-3} | {4,-22} |
+            string format = builder.Format(delim);
+
+            if (format == string.Empty)
+            {
+                return strBuilder;
+            }
+
+            // find the longest formatted line
+            var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(format, row.ToArray()).Length) : 0);
+
+            string formatWithoutContent = builder.FormatWithoutContent(delim);
+
+            var beginTableFormat = formatWithoutContent;
+            beginTableFormat = filledMap[CharMapPositions.TopLeft] + beginTableFormat.Substring(1);
+            beginTableFormat = beginTableFormat.Substring(0, beginTableFormat.Length - 1) + filledMap[CharMapPositions.TopRight];
+            beginTableFormat = beginTableFormat.Replace(' ', filledMap[CharMapPositions.BorderX]).Replace(delim, filledMap[CharMapPositions.TopCenter]);
+
+            if (builder.TableTitle.Length > beginTableFormat.Length)
+            {
+                if (beginTableFormat.Length < 10)
+                {
+                    builder.TableTitle = builder.TableTitle.Substring(0, beginTableFormat.Length - 4);
+                }
+                else
+                {
+                    if (beginTableFormat.Length < 20)
+                    {
+                        builder.TableTitle = builder.TableTitle.Substring(0, beginTableFormat.Length - 7);
+                    }
+                    else
+                    {
+                        builder.TableTitle = builder.TableTitle.Substring(0, beginTableFormat.Length - 7) + "...";
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(builder.TableTitle) && builder.TableTitle.Trim().Length > 0) // !IsNullOrWhiteSpace
+            {
+                var newBeginTableFormat = beginTableFormat.Substring(0, (beginTableFormat.Length - builder.TableTitle.Length) / 2 - 1) + ' ';
+                newBeginTableFormat += builder.TableTitle + ' ';
+                newBeginTableFormat += beginTableFormat.Substring(newBeginTableFormat.Length, beginTableFormat.Length - newBeginTableFormat.Length);
+
+                beginTableFormat = newBeginTableFormat;
+            }
+
+            if (beginTableFormat.Trim('\0').Length == 0)
+            {
+                beginTableFormat = string.Empty;
+            }
+
+            var rowContentTableFormat = format;
+            rowContentTableFormat = filledMap[CharMapPositions.BorderY] + rowContentTableFormat.Substring(1);
+            rowContentTableFormat = rowContentTableFormat.Substring(0, rowContentTableFormat.Length - 1) + filledMap[CharMapPositions.BorderY];
+            rowContentTableFormat = rowContentTableFormat.Replace(delim, filledMap[CharMapPositions.DividerY]);
+
+            var dividerTableFormat = formatWithoutContent;
+            dividerTableFormat = filledMap[CharMapPositions.MiddleLeft] + dividerTableFormat.Substring(1);
+            dividerTableFormat = dividerTableFormat.Substring(0, dividerTableFormat.Length - 1) + filledMap[CharMapPositions.MiddleRight];
+            dividerTableFormat = dividerTableFormat.Replace(' ', filledMap[CharMapPositions.DividerX]).Replace(delim, filledMap[CharMapPositions.MiddleCenter]);
+
+            if (dividerTableFormat.Trim('\0').Length == 0)
+            {
+                dividerTableFormat = string.Empty;
+            }
+
+            var endTableFormat = formatWithoutContent;
+            endTableFormat = filledMap[CharMapPositions.BottomLeft] + endTableFormat.Substring(1);
+            endTableFormat = endTableFormat.Substring(0, endTableFormat.Length - 1) + filledMap[CharMapPositions.BottomRight];
+            endTableFormat = endTableFormat.Replace(' ', filledMap[CharMapPositions.BorderX]).Replace(delim, filledMap[CharMapPositions.BottomCenter]);
+
+            if (endTableFormat.Trim('\0').Length == 0)
+            {
+                endTableFormat = string.Empty;
+            }
+
+            // header formats
+            var beginHeaderFormat = string.Empty;
+            var rowContentHeaderFormat = string.Empty;
+            var endHeaderFormat = string.Empty;
+
+            var hasHeader = builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0 ;
+            if (hasHeader)
+            {
+                if (filledHeaderMap != null)
+                {
+                    beginHeaderFormat = formatWithoutContent;
+                    beginHeaderFormat = filledHeaderMap[HeaderCharMapPositions.TopLeft] + beginHeaderFormat.Substring(1);
+                    beginHeaderFormat = beginHeaderFormat.Substring(0, beginHeaderFormat.Length - 1) + filledHeaderMap[HeaderCharMapPositions.TopRight];
+                    beginHeaderFormat = beginHeaderFormat.Replace(' ', filledHeaderMap[HeaderCharMapPositions.BorderXTop]).Replace(delim, filledHeaderMap[HeaderCharMapPositions.TopCenter]);
+
+                    if (builder.TableTitle.Length > beginHeaderFormat.Length)
+                    {
+                        if (beginHeaderFormat.Length < 10)
+                        {
+                            builder.TableTitle = builder.TableTitle.Substring(0, beginHeaderFormat.Length - 4);
+                        }
+                        else
+                        {
+                            if (beginHeaderFormat.Length < 20)
+                            {
+                                builder.TableTitle = builder.TableTitle.Substring(0, beginHeaderFormat.Length - 7);
+                            }
+                            else
+                            {
+                                builder.TableTitle = builder.TableTitle.Substring(0, beginHeaderFormat.Length - 7) + "...";
+                            }
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(builder.TableTitle) && builder.TableTitle.Trim().Length > 0) // !IsNullOrWhiteSpace
+                    {
+                        var newBeginHeaderFormat = beginHeaderFormat.Substring(0, (beginHeaderFormat.Length - builder.TableTitle.Length) / 2 - 1) + ' ';
+                        newBeginHeaderFormat += builder.TableTitle + ' ';
+                        newBeginHeaderFormat += beginHeaderFormat.Substring(newBeginHeaderFormat.Length, beginHeaderFormat.Length - newBeginHeaderFormat.Length);
+
+                        beginHeaderFormat = newBeginHeaderFormat;
+                    }
+
+                    if (beginHeaderFormat.Trim('\0').Length == 0)
+                    {
+                        beginHeaderFormat = string.Empty;
+                    }
+
+                    rowContentHeaderFormat = format;
+                    rowContentHeaderFormat = filledHeaderMap[HeaderCharMapPositions.BorderY] + rowContentHeaderFormat.Substring(1);
+                    rowContentHeaderFormat = rowContentHeaderFormat.Substring(0, rowContentHeaderFormat.Length - 1) + filledHeaderMap[HeaderCharMapPositions.BorderY];
+                    rowContentHeaderFormat = rowContentHeaderFormat.Replace(delim, filledHeaderMap[HeaderCharMapPositions.Divider]);
+
+                    endHeaderFormat = formatWithoutContent;
+                    endHeaderFormat = filledHeaderMap[HeaderCharMapPositions.BottomLeft] + endHeaderFormat.Substring(1);
+                    endHeaderFormat = endHeaderFormat.Substring(0, endHeaderFormat.Length - 1) + filledHeaderMap[HeaderCharMapPositions.BottomRight];
+                    endHeaderFormat = endHeaderFormat.Replace(' ', filledHeaderMap[HeaderCharMapPositions.BorderXBottom]).Replace(delim, filledHeaderMap[HeaderCharMapPositions.BottomCenter]);
+
+                    if (endHeaderFormat.Trim('\0').Length == 0)
+                    {
+                        endHeaderFormat = string.Empty;
+                    }
+                }
+            }
+
+            // add each row
+            var results = builder.Rows.Select(row => string.Format(rowContentTableFormat, row.ToArray())).ToList();
+
+            // header
+            if (hasHeader)
+            {
+                if (filledHeaderMap != null)
+                {
+                    if (beginHeaderFormat.Length > 0)
+                    {
+                        strBuilder.AppendLine(beginHeaderFormat);
+                    }
+                    
+                    strBuilder.AppendLine(string.Format(rowContentHeaderFormat, builder.Column.ToArray()));
+                }
+                else
+                {
+                    if (beginTableFormat.Length > 0)
+                    {
+                        strBuilder.AppendLine(beginTableFormat);
+                    }
+                    
+                    strBuilder.AppendLine(string.Format(rowContentTableFormat, builder.Column.ToArray()));
+                }
+            }
+            //else
+            //{
+            //    if (beginTableFormat.Length > 0) strBuilder.AppendLine(beginTableFormat);
+            //    strBuilder.AppendLine(string.Format(rowContentTableFormat, builder.Column.ToArray()));
+            //}
+
+            var isFirstRow = true;
+            foreach (var row in results)
+            {
+                if (isFirstRow)
+                {
+                    if (hasHeader)
+                    {
+                        if ((string.IsNullOrEmpty(endHeaderFormat) || endHeaderFormat.Length == 0) && dividerTableFormat.Length > 0)
+                        {
+                            strBuilder.AppendLine(dividerTableFormat);
+                        }
+                        else
+                        {
+                            if (endHeaderFormat.Length > 0)
+                            {
+                                strBuilder.AppendLine(endHeaderFormat);
+                            }                            
+                        }
+                    }
+                    else
+                    {
+                        if (beginTableFormat.Length > 0)
+                        {
+                            strBuilder.AppendLine(beginTableFormat);
+                        }                        
+                    }                    
+
+                    isFirstRow = false;
+                }
+                else
+                {
+                    if (dividerTableFormat.Length > 0)
+                    {
+                        strBuilder.AppendLine(dividerTableFormat);
+                    }                    
+                }
+
+                strBuilder.AppendLine(row);
+            }
+
+            if (results.Any())
+            {
+                if (endTableFormat.Length > 0)
+                {
+                    strBuilder.AppendLine(endTableFormat);
+                }
+            }
+            else
+            {
+                if ((string.IsNullOrEmpty(endHeaderFormat) || endHeaderFormat.Length == 0) && endTableFormat.Length > 0)
+                {
+                    strBuilder.AppendLine(endTableFormat);
+                }
+                else
+                {
+                    if (endHeaderFormat.Length > 0)
+                    {
+                        strBuilder.AppendLine(endHeaderFormat);
+                    }
+                }
+            }
+
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Bottom);
+            return strBuilder;
+        }
+
+        private static StringBuilder CreateTableForMinimalFormat(ConsoleTableBuilder builder)
+        {
+            var strBuilder = new StringBuilder();
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Top);
+
+            // create the string format with padding
+            var format = builder.Format('\0');
 
             if (format == string.Empty)
             {
@@ -241,7 +649,7 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerString);
+            var divider = Regex.Replace(columnHeaders, @"[^|]", '-'.ToString());
 
             strBuilder.AppendLine(columnHeaders);
             strBuilder.AppendLine(divider);
@@ -250,24 +658,18 @@ namespace ConsoleTableExt
             var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
             results.ForEach(row => strBuilder.AppendLine(row));
 
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
-            {
-                strBuilder.AppendLine(BuildMetaRowFormat(builder));
-            }
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Bottom);
 
             return strBuilder;
         }
 
-        private static StringBuilder CreateTableForAlternativeFormat(ConsoleTableBuilder builder)
+        private static StringBuilder CreateTableForMarkdownFormat(ConsoleTableBuilder builder)
         {
             var strBuilder = new StringBuilder();
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Top)
-            {
-                strBuilder.AppendLine(BuildMetaRowFormat(builder));
-            }
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Top);
 
             // create the string format with padding
-            var format = builder.Format(builder.Options.Delimiter);
+            var format = builder.Format('|');
 
             if (format == string.Empty)
             {
@@ -289,7 +691,49 @@ namespace ConsoleTableExt
             }
 
             // create the divider
-            var divider = Regex.Replace(columnHeaders, @"[^|]", builder.Options.DividerString);
+            var divider = Regex.Replace(columnHeaders, @"[^|]", '-'.ToString());
+
+            strBuilder.AppendLine(columnHeaders);
+            strBuilder.AppendLine(divider);
+
+            // add each row
+            var results = builder.Rows.Skip(skipFirstRow ? 1 : 0).Select(row => string.Format(format, row.ToArray())).ToList();
+            results.ForEach(row => strBuilder.AppendLine(row));
+
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Bottom);
+
+            return strBuilder;
+        }
+
+        private static StringBuilder CreateTableForAlternativeFormat(ConsoleTableBuilder builder)
+        {
+            var strBuilder = new StringBuilder();
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Top);
+
+            // create the string format with padding
+            var format = builder.Format('|');
+
+            if (format == string.Empty)
+            {
+                return strBuilder;
+            }
+
+            var skipFirstRow = false;
+            var columnHeaders = string.Empty;
+
+            if (builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0)
+            {
+                skipFirstRow = false;
+                columnHeaders = string.Format(format, builder.Column.ToArray());
+            }
+            else
+            {
+                skipFirstRow = true;
+                columnHeaders = string.Format(format, builder.Rows.First().ToArray());
+            }
+
+            // create the divider
+            var divider = Regex.Replace(columnHeaders, @"[^|]", '-'.ToString());
             var dividerPlus = divider.Replace("|", "+");
 
             strBuilder.AppendLine(dividerPlus);
@@ -305,28 +749,79 @@ namespace ConsoleTableExt
             }
             strBuilder.AppendLine(dividerPlus);
 
-            if (builder.Options.MetaRowPosition == MetaRowPosition.Bottom)
-            {
-                strBuilder.AppendLine(BuildMetaRowFormat(builder));
-            }
+            BuildMetaRowsFormat(builder, strBuilder, MetaRowPositions.Bottom);
             return strBuilder;
         }
 
-        private static string BuildMetaRowFormat(ConsoleTableBuilder builder)
+        private static StringBuilder BuildMetaRowsFormat(ConsoleTableBuilder builder, StringBuilder stringBuilder, MetaRowPositions position)
         {
-            var result = new StringBuilder().AppendFormat(builder.Options.MetaRowFormat, builder.Options.MetaRowParams).ToString();
-
-            if (result.Contains(AppConstants.MetaRow.ROW_COUNT))
+            switch (position)
             {
-                result = result.Replace(AppConstants.MetaRow.ROW_COUNT, builder.Rows.Count.ToString());
+                case MetaRowPositions.Top:
+                    if (builder.TopMetadataRows.Any())
+                    {
+                        foreach (var item in builder.TopMetadataRows)
+                        {
+                            stringBuilder.AppendLine(item.Value);
+                        }
+                    }
+                    break;
+                case MetaRowPositions.Bottom:
+                    if (builder.BottomMetadataRows.Any())
+                    {
+                        foreach (var item in builder.BottomMetadataRows)
+                        {
+                            stringBuilder.AppendLine(item.Value);
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
 
-            if (result.Contains(AppConstants.MetaRow.COLUMN_COUNT))
-            {
-                result = result.Replace(AppConstants.MetaRow.COLUMN_COUNT, builder.GetCadidateColumnLengths().Count.ToString());
-            }
 
-            return result;
+            return stringBuilder;
         }
+
+        private static Dictionary<CharMapPositions, char> FillCharMap(Dictionary<CharMapPositions, char> definition)
+        {
+            if (definition == null)
+            {
+                return new Dictionary<CharMapPositions, char>();
+            }
+
+            var filledMap = definition;
+
+            foreach (CharMapPositions c in (CharMapPositions[])Enum.GetValues(typeof(CharMapPositions)))
+            {
+                if (!filledMap.ContainsKey(c))
+                {
+                    filledMap.Add(c, '\0');
+                }
+            }
+
+            return filledMap;
+        }
+
+        private static Dictionary<HeaderCharMapPositions, char> FillHeaderCharMap(Dictionary<HeaderCharMapPositions, char> definition)
+        {
+            if (definition == null)
+            {
+                return null;
+            }
+
+            var filledMap = definition;
+
+            foreach (HeaderCharMapPositions c in (HeaderCharMapPositions[])Enum.GetValues(typeof(HeaderCharMapPositions)))
+            {
+                if (!filledMap.ContainsKey(c))
+                {
+                    filledMap.Add(c, '\0');
+                }
+            }
+
+            return filledMap;
+        }
+
     }
 }

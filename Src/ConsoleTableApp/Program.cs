@@ -1,6 +1,7 @@
 ﻿using ConsoleTableExt;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 
 namespace ConsoleTableApp
@@ -10,8 +11,91 @@ namespace ConsoleTableApp
         static void Main(string[] args)
         {
             Console.WriteLine();
+            Console.WriteLine("Text alignment with table title");
+            var tableBuilder = ConsoleTableBuilder.From(SampleListData);
+            tableBuilder
+                .WithFormat(ConsoleTableBuilderFormat.MarkDown)
+                .WithTextAlignment(new Dictionary<int, TextAligntment> {
+                    { 1, TextAligntment.Right },
+                    { 3, TextAligntment.Right },
+                    { 100, TextAligntment.Right }
+                })
+                .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
+                .WithTitle("HELLO I AM TITLE")
+                .ExportAndWriteLine(TableAligntment.Center);
+
+            Console.WriteLine("Text alignment and column min length");
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder
+                .WithTextAlignment(new Dictionary<int, TextAligntment> {
+                    { 1, TextAligntment.Right },
+                    { 3, TextAligntment.Right },
+                    { 100, TextAligntment.Right }
+                })
+                .WithMinLength(new Dictionary<int, int> {
+                    {1, 50}
+                })
+                .WithTitle("I AM ALSO TITLE")
+                .WithCharMapDefinition(CharMapDefinition.FrameDoublePipDefinition)
+                .ExportAndWriteLine();
+
+            Console.WriteLine("Custom format using CharMap");
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder
+                .WithCharMapDefinition(
+                    CharMapDefinition.FramePipDefinition,
+                    new Dictionary<HeaderCharMapPositions, char> {
+                        {HeaderCharMapPositions.TopLeft, '╒' },
+                        {HeaderCharMapPositions.TopCenter, '╤' },
+                        {HeaderCharMapPositions.TopRight, '╕' },
+                        {HeaderCharMapPositions.BottomLeft, '╞' },
+                        {HeaderCharMapPositions.BottomCenter, '╪' },
+                        {HeaderCharMapPositions.BottomRight, '╡' },
+                        {HeaderCharMapPositions.BorderXTop, '═' },
+                        {HeaderCharMapPositions.BorderXBottom, '═' },
+                        {HeaderCharMapPositions.BorderY, '│' },
+                        {HeaderCharMapPositions.Divider, '│' },
+                    })
+                .ExportAndWriteLine(TableAligntment.Right);
+
+            Console.WriteLine("Custom format using CharMap: Header has no divider");
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder
+                .WithCharMapDefinition(
+                    CharMapDefinition.FramePipDefinition,
+                    new Dictionary<HeaderCharMapPositions, char> {
+                        {HeaderCharMapPositions.TopLeft, '╒' },
+                        {HeaderCharMapPositions.TopCenter, '═' },
+                        {HeaderCharMapPositions.TopRight, '╕' },
+                        {HeaderCharMapPositions.BottomLeft, '╞' },
+                        {HeaderCharMapPositions.BottomCenter, '╤' },
+                        {HeaderCharMapPositions.BottomRight, '╡' },
+                        {HeaderCharMapPositions.BorderXTop, '═' },
+                        {HeaderCharMapPositions.BorderXBottom, '═' },
+                        {HeaderCharMapPositions.BorderY, '│' },
+                        {HeaderCharMapPositions.Divider, '\0' },
+                    })
+                .ExportAndWriteLine();
+
+            // --------------------------
+
+            Console.WriteLine();
+            Console.WriteLine("No header FramePipDefinition");
+            tableBuilder = ConsoleTableBuilder.From(SampleListData);
+            tableBuilder
+                .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
+                .ExportAndWriteLine();
+
+            Console.WriteLine("No header FrameDoublePipDefinition:");
+            tableBuilder = ConsoleTableBuilder.From(SampleListData);
+            tableBuilder
+                .WithCharMapDefinition(CharMapDefinition.FrameDoublePipDefinition)
+                .ExportAndWriteLine();
+
+            
+            Console.WriteLine();
             Console.WriteLine("From [DataTable] type and Default format:");
-            var tableBuilder = ConsoleTableBuilder.From(SampleTableData());
+            tableBuilder = ConsoleTableBuilder.From(SampleTableData());
             tableBuilder.ExportAndWriteLine();
 
             Console.WriteLine("From [DataTable] type and Minimal format:");
@@ -40,36 +124,44 @@ namespace ConsoleTableApp
             Console.WriteLine();
 
             Console.WriteLine("From [List<T>] (where T: !class) type and Alternative format:");
-            ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 }).WithFormat(ConsoleTableBuilderFormat.Alternative).WithColumn("I'm a custom name, my default name is 'Value'").ExportAndWrite();
+            ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 }).WithFormat(ConsoleTableBuilderFormat.Alternative).WithColumn("I'm a custom name").ExportAndWrite();
             Console.WriteLine();
-
 
             var arrayBuilder = ConsoleTableBuilder.From(new List<object[]>
             {
-                new object[] {"luong", "son", "ba", null, "phim", null, null, null, 2, null},
-                new object[] {"chuc", "anh", "dai", "nhac", null, null, null }
+                new object[] { "luong", "son", "ba", null, "phim", null, null, null, 2, null},
+                new object[] { "chuc", "anh", "dai", "nhac", null, null, null }
             });
 
             arrayBuilder
+                .TrimColumn(true)
                 .AddRow(new List<object> { 1, "this", "is", "new", "row", "use", "<List>", null, null, null })
                 .AddRow(new object[] { "2", "new row", "use", "array[] values", null, null })
-                .WithOptions(new ConsoleTableBuilderOption
-                {
-                    MetaRowPosition = MetaRowPosition.Bottom,
-                    MetaRowFormat = "\n=> This table has {3} rows and {2} columns\n=> [{0}] - [test value {1}]",
-                    MetaRowParams = new object[]
-                    {
+                .WithMetadataRow(MetaRowPositions.Top, b => string.Format("=> First top line <{0}>", "FIRST"))
+                .WithMetadataRow(MetaRowPositions.Top, b => string.Format("=> Second top line <{0}>", "SECOND"))
+                .WithMetadataRow(
+                    MetaRowPositions.Bottom, 
+                    b => string.Format("\n=> This table has {3} rows and {2} columns\n=> [{0}] - [test value {1}]", 
                         "test value 1",
                         2,
-                        AppConstants.MetaRow.COLUMN_COUNT,
-                        AppConstants.MetaRow.ROW_COUNT
-                    },
-                    TrimColumn = true,
-                    Delimiter = "¡",
-                    DividerString = "»",
-                })
-                .WithFormat(ConsoleTableBuilderFormat.MarkDown)
+                        b.ColumnLength,
+                        b.RowLength
+                    )
+                )
+                .WithMetadataRow(MetaRowPositions.Bottom, b => string.Format("=> Bottom line <{0}>", "HELLO WORLD"))                
                 .WithColumn(new List<string> { "THIS", "IS", "ADVANCED", "OPTIONS" })
+                .WithCharMapDefinition(new Dictionary<CharMapPositions, char> {
+                    { CharMapPositions.BorderY, '¡' },
+                    { CharMapPositions.DividerY, '¡' }
+                })
+                .WithHeaderCharMapDefinition(new Dictionary<HeaderCharMapPositions, char> {
+                    { HeaderCharMapPositions.BottomLeft, '»' },
+                    { HeaderCharMapPositions.BottomCenter, '»' },
+                    { HeaderCharMapPositions.BottomRight, '»' },
+                    { HeaderCharMapPositions.Divider, '¡' },
+                    { HeaderCharMapPositions.BorderXBottom, '»' },
+                    { HeaderCharMapPositions.BorderY, '¡' }
+                })
                 .ExportAndWriteLine();
 
             Console.ReadKey();
@@ -92,13 +184,20 @@ namespace ConsoleTableApp
             return table;
         }
 
+        static List<List<object>> SampleShortListData = new List<List<object>>
+        {
+            new List<object>{ ""},
+            new List<object>{ ""},
+            new List<object>{ ""},
+            new List<object>{ ""},
+        };
+
         static List<List<object>> SampleListData = new List<List<object>>
         {
             new List<object>{ "Sakura Yamamoto", "Support Engineer", "London", 46},
             new List<object>{ "Serge Baldwin", "Data Coordinator", "San Francisco", 28, "something else" },
             new List<object>{ "Shad Decker", "Regional Director", "Edinburgh"},
         };
-
 
         static List<Employee> SampleEmployeesList = new List<Employee>
         {
@@ -118,6 +217,8 @@ namespace ConsoleTableApp
                 Age = age;
                 StartDate = startDate;
             }
+
+            [Description("N - A - M - E")]
             public string Name { get; set; }
             public string Position { get; set; }
             public string Office { get; set; }
