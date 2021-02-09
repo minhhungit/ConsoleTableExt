@@ -87,9 +87,44 @@ namespace ConsoleTableExt
             return builder;
         }
 
+        /// <summary>
+        /// Add title row on top of table (just available for Custom Format - using WithCharMapDefinition method)
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="title"></param>
+        /// <returns></returns>
         public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title)
         {
             builder.TableTitle = title;
+            return builder;
+        }
+
+        /// <summary>
+        /// Add title row on top of table (just available for Custom Format - using WithCharMapDefinition method)
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="title"></param>
+        /// <param name="foregroundColor">text color</param>
+        /// <returns></returns>
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor)
+        {
+            builder.TableTitle = title;
+            builder.TableTitleColor = new ConsoleColorNullable(foregroundColor);
+            return builder;
+        }
+
+        /// <summary>
+        /// Add title row on top of table (just available for Custom Format - using WithCharMapDefinition method)
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="title"></param>
+        /// <param name="foregroundColor">text color</param>
+        /// <param name="backgroundColor">background color</param>
+        /// <returns></returns>
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+        {
+            builder.TableTitle = title;
+            builder.TableTitleColor = new ConsoleColorNullable(foregroundColor, backgroundColor);
             return builder;
         }
 
@@ -265,41 +300,67 @@ namespace ConsoleTableExt
         {
             var strBuilder = builder.Export();
 
-            if (alignment != TableAligntment.Left)
-            {
-                var lines = strBuilder.ToString().Split('\n');
+            var lines = strBuilder.ToString().Split('\n');
 
-                var linesCount = lines.Count();
-                for (int i = 0; i < linesCount; i++)
+            var linesCount = lines.Count();
+            for (int i = 0; i < linesCount; i++)
+            {
+                var row = string.Empty;
+
+                switch (alignment)
                 {
-                    switch (alignment)
+                    case TableAligntment.Left:
+                        row = lines[i];
+                        break;
+                    case TableAligntment.Center:
+                        row = String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]);
+                        break;
+                    case TableAligntment.Right:
+                        row = String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]);
+                        break;
+                }
+
+                if (i == 0 && !string.IsNullOrEmpty(builder.TableTitle) && builder.TableTitle.Trim().Length != 0 && !builder.TableTitleColor.IsForegroundColorNull)
+                {
+                    var textRange = row.Split('\0');
+                    if (textRange.Count() == 3)
                     {
-                        case TableAligntment.Center:
-                            if (i == linesCount - 1)
-                            {
-                                Console.Write(String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]));
-                            }
-                            else
-                            {
-                                Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]));
-                            }
-                            break;
-                        case TableAligntment.Right:
-                            if (i == linesCount - 1)
-                            {
-                                Console.Write(String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]));
-                            }
-                            else
-                            {
-                                Console.WriteLine(String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]));
-                            }
-                            break;
+                        Console.Write(textRange[0]);
+
+                        Console.ForegroundColor = builder.TableTitleColor.ForegroundColor;
+                        if (!builder.TableTitleColor.IsBackgroundColorNull)
+                        {
+                            Console.BackgroundColor = builder.TableTitleColor.BackgroundColor;
+                        }
+
+                        Console.Write(string.Format(" {0} ", textRange[1]));
+                        Console.ResetColor();
+                        Console.Write(textRange[2]);
+                        Console.Write('\n');
+                    }
+                    else
+                    {
+                        if (i == linesCount - 1)
+                        {
+                            Console.Write(row);
+                        }
+                        else
+                        {
+                            Console.WriteLine(row);
+                        }
                     }
                 }
-            }
-            else
-            {
-                Console.Write(strBuilder);
+                else
+                {
+                    if (i == linesCount - 1)
+                    {
+                        Console.Write(row);
+                    }
+                    else
+                    {
+                        Console.WriteLine(row);
+                    }
+                }
             }
         }
 
@@ -307,29 +368,55 @@ namespace ConsoleTableExt
         {
             var strBuilder = builder.Export();
 
-            if (alignment != TableAligntment.Left)
+            var lines = strBuilder.ToString().Split('\n');
+            
+            var linesCount = lines.Count();
+            for (int i = 0; i < linesCount; i++)
             {
-                var lines = strBuilder.ToString().Split('\n');
-
-                var linesCount = lines.Count();
-                for (int i = 0; i < linesCount; i++)
+                var row = string.Empty;
+                switch (alignment)
                 {
-                    switch (alignment)
+                    case TableAligntment.Left:
+                        row = lines[i];
+                        break;
+                    case TableAligntment.Center:
+                        row = String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]);
+                        break;
+                    case TableAligntment.Right:
+                        row = String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]);
+                        break;
+                }
+
+                if (i == 0 && !string.IsNullOrEmpty(builder.TableTitle) && builder.TableTitle.Trim().Length != 0 && !builder.TableTitleColor.IsForegroundColorNull)
+                {
+                    var textRange = row.Split('\0');
+                    if (textRange.Count() == 3)
                     {
-                        case TableAligntment.Center:
-                            Console.WriteLine(String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]));
-                            break;
-                        case TableAligntment.Right:
-                            Console.WriteLine(String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]));
-                            break;
+                        Console.Write(textRange[0]);
+
+                        Console.ForegroundColor = builder.TableTitleColor.ForegroundColor;
+                        if (!builder.TableTitleColor.IsBackgroundColorNull)
+                        {
+                            Console.BackgroundColor = builder.TableTitleColor.BackgroundColor;
+                        }
+                        
+                        Console.Write(string.Format(" {0} ", textRange[1]));
+                        Console.ResetColor();
+                        Console.Write(textRange[2]);
+                        Console.Write('\n');
+                    }
+                    else
+                    {
+                        Console.WriteLine(row);
                     }
                 }
-            }
-            else
-            {
-                Console.WriteLine(strBuilder);
+                else
+                {
+                    Console.WriteLine(row);
+                }                
             }
         }
+
 
         private static StringBuilder CreateTableForDefaultFormat(ConsoleTableBuilder builder)
         {
@@ -422,8 +509,9 @@ namespace ConsoleTableExt
 
             if (!string.IsNullOrEmpty(builder.TableTitle) && builder.TableTitle.Trim().Length > 0) // !IsNullOrWhiteSpace
             {
-                var newBeginTableFormat = beginTableFormat.Substring(0, (beginTableFormat.Length - builder.TableTitle.Length) / 2 - 1) + ' ';
-                newBeginTableFormat += builder.TableTitle + ' ';
+                var newBeginTableFormat = beginTableFormat.Substring(0, (beginTableFormat.Length - builder.TableTitle.Length) / 2 - 1) + '\0';
+                //newBeginTableFormat = string.Format("{0}\0{1}\0 ", newBeginTableFormat, builder.TableTitle);
+                newBeginTableFormat += builder.TableTitle + '\0';
                 newBeginTableFormat += beginTableFormat.Substring(newBeginTableFormat.Length, beginTableFormat.Length - newBeginTableFormat.Length);
 
                 beginTableFormat = newBeginTableFormat;

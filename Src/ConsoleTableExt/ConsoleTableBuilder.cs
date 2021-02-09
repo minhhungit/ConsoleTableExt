@@ -19,6 +19,7 @@ namespace ConsoleTableExt
 
         internal bool CanTrimColumn = false;
         internal string TableTitle = string.Empty;
+        internal ConsoleColorNullable TableTitleColor = new ConsoleColorNullable();
 
         private ConsoleTableBuilder()
         {
@@ -248,8 +249,8 @@ namespace ConsoleTableExt
             return columnLengths;
         }
 
-        public long ColumnLength { get { return this.GetCadidateColumnLengths().Count; } }
-        public long RowLength { get { return this.Rows.Count; } }
+        public int ColumnLength { get { return this.GetCadidateColumnLengths().Count; } }
+        public int RowLength { get { return this.Rows.Count; } }
 
         internal string Format(char delimiter)
         {

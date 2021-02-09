@@ -5,11 +5,53 @@ using System.ComponentModel;
 using System.Data;
 
 namespace ConsoleTableApp
-{
+{ 
     class Program
     {
         static void Main(string[] args)
         {
+            //var abc = new List<object>();
+
+            //abc.Add(ConsoleColor.Red);
+            //abc.Add("Jin aa faf a f");
+            //abc.Add('\0');
+            //abc.Add(", ");
+            //abc.Add(ConsoleColor.Blue);
+            //abc.Add("hello");
+            //abc.Add(" world");
+            //abc.Add('\n');
+
+            //var charIndex = 0;
+            //while (true)
+            //{
+            //    if (charIndex >= abc.Count)
+            //    {
+            //        break;
+            //    }
+
+            //    if (abc[charIndex] is ConsoleColor)
+            //    {
+            //        Console.ForegroundColor = (ConsoleColor)abc[charIndex];
+            //    }
+            //    else
+            //    {
+            //        if (abc[charIndex] is char && ((char)abc[charIndex] == '\0' || (char)abc[charIndex] == '\n'))
+            //        {
+            //            Console.ResetColor();
+            //            if ((char)abc[charIndex] == '\n')
+            //            {
+            //                Console.Write('\n');
+            //            }
+            //        }
+            //        else
+            //        {
+            //            Console.Write(abc[charIndex]);
+            //        }
+            //    }
+
+            //    charIndex++;
+            //}
+
             Console.WriteLine();
             Console.WriteLine("Text alignment with table title");
             var tableBuilder = ConsoleTableBuilder.From(SampleListData);
@@ -21,7 +63,7 @@ namespace ConsoleTableApp
                     { 100, TextAligntment.Right }
                 })
                 .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
-                .WithTitle("HELLO I AM TITLE")
+                .WithTitle("HELLO I AM TITLE", ConsoleColor.Green, ConsoleColor.DarkGray)
                 .ExportAndWriteLine(TableAligntment.Center);
 
             Console.WriteLine("Text alignment and column min length");
@@ -35,7 +77,7 @@ namespace ConsoleTableApp
                 .WithMinLength(new Dictionary<int, int> {
                     {1, 50}
                 })
-                .WithTitle("I AM ALSO TITLE")
+                .WithTitle("I AM ALSO TITLE", ConsoleColor.Yellow, ConsoleColor.DarkMagenta)
                 .WithCharMapDefinition(CharMapDefinition.FrameDoublePipDefinition)
                 .ExportAndWriteLine();
 
