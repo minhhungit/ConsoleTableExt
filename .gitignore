@@ -17,3 +17,6 @@
 /Src/ConsoleTableApp/obj/Release
 /Src/ConsoleTableExt/bin/Release
 .vs/
+/ConsoleTableExt.Tests/bin/Debug
+/ConsoleTableExt.Tests/obj/Debug
+/packages

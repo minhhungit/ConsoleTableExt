@@ -15,8 +15,10 @@ namespace ConsoleTableExt
             { CharMapPositions.BottomLeft, '└' },
             { CharMapPositions.BottomCenter, '┴' },
             { CharMapPositions.BottomRight, '┘' },
-            { CharMapPositions.BorderY, '│' },
-            { CharMapPositions.BorderX, '─' },
+            { CharMapPositions.BorderLeft, '│' },
+            { CharMapPositions.BorderRight, '│' },
+            { CharMapPositions.BorderTop, '─' },
+            { CharMapPositions.BorderBottom, '─' },
             { CharMapPositions.DividerY, '│' },
             { CharMapPositions.DividerX, '─' },
         };
@@ -32,8 +34,10 @@ namespace ConsoleTableExt
             { CharMapPositions.BottomLeft, '╚' },
             { CharMapPositions.BottomCenter, '╧' },
             { CharMapPositions.BottomRight, '╝' },
-            { CharMapPositions.BorderY, '║' },
-            { CharMapPositions.BorderX, '═' },
+            { CharMapPositions.BorderLeft, '║' },
+            { CharMapPositions.BorderRight, '║' },
+            { CharMapPositions.BorderTop, '═' },
+            { CharMapPositions.BorderBottom, '═' },
             { CharMapPositions.DividerY, '│' },
             { CharMapPositions.DividerX, '─' }
         };
