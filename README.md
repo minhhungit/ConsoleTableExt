@@ -5,6 +5,20 @@ A library to print out a nicely formatted table in a console application C#
 ### Nuget
 > Install-Package ConsoleTableExt
 
+### Feature
+
+- Table alignment (left right and center)
+- Column alignment (left/right)
+- Table can have TITLE, can change text color and background color of title
+- Support power char-map, strong customization ability
+- Contain some popular formas like Markdown table...
+- Support text formatter
+- Support many kind data type: DataTable, List<object>...
+- Support metadata row (placed at top or bottom of table)
+- Column min-length 
+- support .NET Framework >= 3.5, .NET core
+- ...
+
 ### How to use:
 
 ```csharp
