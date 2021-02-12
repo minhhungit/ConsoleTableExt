@@ -8,7 +8,11 @@ namespace ConsoleTableExt
     public class ConsoleTableBuilder
     {
         internal List<object> Column { get; set; }
+        internal List<string> FormattedColumns { get; set; }
+
         internal List<List<object>> Rows { get; set; }
+        internal List<List<object>> FormattedRows { get; set; }
+
         internal ConsoleTableBuilderFormat TableFormat { get; set; }
         internal Dictionary<CharMapPositions, char> CharMapPositionStore { get; set; } = null;
         internal Dictionary<HeaderCharMapPositions, char> HeaderCharMapPositionStore { get; set; } = null;
@@ -25,6 +29,9 @@ namespace ConsoleTableExt
 
         internal int TitlePositionStartAt { get; set; }
         internal int TitlePositionLength { get; set; }
+
+        internal Dictionary<int, Func<string, string>> FormatterStore = new Dictionary<int, Func<string, string>>();
+        internal Dictionary<int, bool> FormatterHeaderFlags = new Dictionary<int, bool>();
 
         private ConsoleTableBuilder()
         {
@@ -161,20 +168,56 @@ namespace ConsoleTableExt
             return builder;
         }
 
+        internal void PopulateFormattedColumnsRows()
+        {
+            FormattedColumns = Enumerable.Range(0, Column.Count)
+                .Select(idx =>
+                {
+                    if (FormatterHeaderFlags.ContainsKey(idx) && FormatterHeaderFlags[idx] && FormatterStore.ContainsKey(idx))
+                    {
+                        return FormatterStore[idx](Column[idx] == null ? string.Empty : Column[idx].ToString());
+                    }
+                    else
+                    {
+                        return Column[idx] == null ? string.Empty : Column[idx].ToString();
+                    }
+                }).ToList();
+
+
+            FormattedRows = new List<List<object>>();
+            for (int i = 0; i < Rows.Count; i++)
+            {
+                FormattedRows.Add(
+                    Enumerable.Range(0, Rows[i].Count)
+                    .Select(idx => {
+                        if (FormatterStore.ContainsKey(idx))
+                        {
+                            return FormatterStore[idx](Rows[i][idx] == null ? string.Empty : Rows[i][idx].ToString());
+                        }
+                        else
+                        {
+                            return Rows[i][idx];
+                        }
+                    }).ToList());
+            }
+        }
+
         internal List<int> GetCadidateColumnLengths()
         {
+            PopulateFormattedColumnsRows();
+
             var columnLengths = new List<int>();
 
             var numberOfColumns = 0;
-            if (Rows.Any())
+            if (FormattedRows.Any())
             {
-                numberOfColumns = Rows.Max(x => x.Count);
+                numberOfColumns = FormattedRows.Max(x => x.Count);
             }
             else
             {
-                if (Column != null)
+                if (FormattedColumns != null)
                 {
-                    numberOfColumns = Column.Count;
+                    numberOfColumns = FormattedColumns.Count;
                 }                
             }
 
@@ -183,25 +226,25 @@ namespace ConsoleTableExt
                 return new List<int>();
             }
 
-            if (numberOfColumns < Column.Count)
+            if (numberOfColumns < FormattedColumns.Count)
             {
-                numberOfColumns = Column.Count;
+                numberOfColumns = FormattedColumns.Count;
             }
 
             for (var i = 0; i < numberOfColumns; i++)
             {
                 var maxRow = 0;
-                if (Rows.Any())
+                if (FormattedRows.Any())
                 {
-                    maxRow = Rows
+                    maxRow = FormattedRows
                         .Where(x => i < x.Count)
                         .Select(x => x[i]) // list cells of column i
                         .Max(x => x == null ? 0 : x.ToString().Length);
                 }
 
-                if (Column.ToArray().Length > i && (Column[i] ?? string.Empty).ToString().Length > maxRow)
+                if (FormattedColumns.ToArray().Length > i && (FormattedColumns[i] ?? string.Empty).ToString().Length > maxRow)
                 {
-                    maxRow = Column[i].ToString().Length;
+                    maxRow = FormattedColumns[i].ToString().Length;
                 }
 
                 if (MinLengthData != null && MinLengthData.ContainsKey(i))
@@ -211,7 +254,7 @@ namespace ConsoleTableExt
                 else
                 {
                     columnLengths.Add(maxRow);
-                }                
+                }
             }
 
             //if (!columnLengths.Any())
@@ -254,8 +297,8 @@ namespace ConsoleTableExt
             return columnLengths;
         }
 
-        public int ColumnLength { get { return this.GetCadidateColumnLengths().Count; } }
-        public int RowLength { get { return this.Rows.Count; } }
+        public int NumberOfColumns { get { return this.GetCadidateColumnLengths().Count; } }
+        public int NumberOfRows { get { return this.Rows.Count; } }
 
         //internal string Format(char delimiter)
         //{

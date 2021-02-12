@@ -87,7 +87,7 @@ namespace ConsoleTableExt
         }
 
         /// <summary>
-        /// Add title row on top of table (just available for Custom Format - using WithCharMapDefinition method)
+        /// Add title row on top of table
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="title"></param>
@@ -99,7 +99,7 @@ namespace ConsoleTableExt
         }
 
         /// <summary>
-        /// Add title row on top of table (just available for Custom Format - using WithCharMapDefinition method)
+        /// Add title row on top of table
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="title"></param>
@@ -113,7 +113,7 @@ namespace ConsoleTableExt
         }
 
         /// <summary>
-        /// Add title row on top of table (just available for Custom Format - using WithCharMapDefinition method)
+        /// Add title row on top of table
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="title"></param>
@@ -136,6 +136,29 @@ namespace ConsoleTableExt
         public static ConsoleTableBuilder WithPaddingRight(this ConsoleTableBuilder builder, string paddingRight)
         {
             builder.PaddingRight = paddingRight ?? string.Empty;
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithFormatter(this ConsoleTableBuilder builder, int columnIndex, Func<string, string> formatter, bool includeHeaderIfHas = false)
+        {
+            if (!builder.FormatterStore.ContainsKey(columnIndex))
+            {
+                builder.FormatterStore.Add(columnIndex, formatter);
+            }
+            else
+            {
+                builder.FormatterStore[columnIndex] = formatter;
+            }
+
+            if (!builder.FormatterHeaderFlags.ContainsKey(columnIndex))
+            {
+                builder.FormatterHeaderFlags.Add(columnIndex, includeHeaderIfHas);
+            }
+            else
+            {
+                builder.FormatterHeaderFlags[columnIndex] = includeHeaderIfHas;
+            }
+
             return builder;
         }
 
@@ -453,6 +476,9 @@ namespace ConsoleTableExt
                 builder.WithFormat(ConsoleTableBuilderFormat.Default);
             }
 
+            builder.PopulateFormattedColumnsRows();
+            var columnLengths = builder.GetCadidateColumnLengths();
+
             var filledMap = FillCharMap(builder.CharMapPositionStore);
             var filledHeaderMap = FillHeaderCharMap(builder.HeaderCharMapPositionStore);
 
@@ -463,20 +489,10 @@ namespace ConsoleTableExt
                 strBuilder.AppendLine(topMetadataStringBuilder[i]);
             }            
 
-            var columnLengths = builder.GetCadidateColumnLengths();
-
             var tableTopLine = builder.CreateTableTopLine(columnLengths, filledMap);
             var tableRowContentFormat = builder.CreateTableContentLineFormat(columnLengths, filledMap);
             var tableMiddleLine = builder.CreateTableMiddleLine(columnLengths, filledMap);
             var tableBottomLine = builder.CreateTableBottomLine(columnLengths, filledMap);
-
-            //canRemoveBorderLeft = new string[] { tableTopLine, tableRowContentFormat, tableMiddleLine, tableBottomLine }
-            //.Select(x => x != null && x.Length > 0 ? x[0].ToString() : string.Empty)
-            //.Aggregate((s, a) => s + a).Replace("\0", string.Empty).Trim().Length == 0;
-
-            //canRemoveBorderRight = new string[] { tableTopLine, tableRowContentFormat, tableMiddleLine, tableBottomLine }
-            //.Select(x => x != null && x.Length > 0 ? x[x.Length - 1].ToString() : string.Empty)
-            //.Aggregate((s, a) => s + a).Replace("\0", string.Empty).Trim().Length == 0;
 
             var headerTopLine = string.Empty;
             var headerRowContentFormat = string.Empty;
@@ -488,111 +504,6 @@ namespace ConsoleTableExt
                 headerRowContentFormat = builder.CreateHeaderContentLineFormat(columnLengths, filledMap, filledHeaderMap);
                 headerBottomLine = builder.CreateHeaderBottomLine(columnLengths, filledMap, filledHeaderMap);
             }
-
-            //if (filledHeaderMap == null) // no header config
-            //{
-            //    var mapEmptyChar = new List<int>();
-            //    for (int i = 0; i < tableRowContentFormat.Length; i++)
-            //    {
-            //        if (tableRowContentFormat[i] == '\0')
-            //        {
-            //            mapEmptyChar.Add(i);
-            //        }
-            //    }
-
-            //    for (int i = mapEmptyChar.Count - 1; i >= 0; i--)
-            //    {
-            //        var canTrim = new string[] { tableTopLine, tableRowContentFormat, tableMiddleLine, tableBottomLine }
-            //         .Select(x => x != null && x.Length > mapEmptyChar[i] ? x[mapEmptyChar[i]].ToString() : string.Empty)
-            //         .Aggregate((s, a) => s + a).Replace("\0", string.Empty).Trim().Length == 0;
-
-            //        if (canTrim)
-            //        {
-            //            if (mapEmptyChar[i] < tableTopLine.Length)
-            //            {
-            //                tableTopLine = tableTopLine.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < tableRowContentFormat.Length)
-            //            {
-            //                tableRowContentFormat = tableRowContentFormat.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < tableMiddleLine.Length)
-            //            {
-            //                tableMiddleLine = tableMiddleLine.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < tableBottomLine.Length)
-            //            {
-            //                tableBottomLine = tableBottomLine.Remove(mapEmptyChar[i], 1);
-            //            }
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    var mapEmptyChar = new List<int>();
-            //    for (int i = 0; i < headerRowContentFormat.Length; i++)
-            //    {
-            //        if (headerRowContentFormat[i] == '\0')
-            //        {
-            //            mapEmptyChar.Add(i);
-            //        }
-            //    }
-
-            //    for (int i = mapEmptyChar.Count - 1; i >= 0; i--)
-            //    {
-            //        var canTrim = new string[] { 
-            //            headerTopLine.Length > 0 ? headerTopLine : tableTopLine, 
-            //            headerRowContentFormat, 
-            //            headerBottomLine.Length > 0 ? headerBottomLine : tableMiddleLine,
-            //            tableMiddleLine,
-            //            tableRowContentFormat,
-            //            tableBottomLine
-            //        }
-            //         .Select(x => x != null && x.Length > mapEmptyChar[i] ? x[mapEmptyChar[i]].ToString() : string.Empty)
-            //         .Aggregate((s, a) => s + a).Replace("\0", string.Empty).Trim().Length == 0;
-
-            //        if (canTrim)
-            //        {
-            //            if (mapEmptyChar[i] < headerTopLine.Length)
-            //            {
-            //                headerTopLine = headerTopLine.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < headerRowContentFormat.Length)
-            //            {
-            //                headerRowContentFormat = headerRowContentFormat.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < headerBottomLine.Length)
-            //            {
-            //                headerBottomLine = headerBottomLine.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < tableTopLine.Length)
-            //            {
-            //                tableTopLine = tableTopLine.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < tableRowContentFormat.Length)
-            //            {
-            //                tableRowContentFormat = tableRowContentFormat.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < tableMiddleLine.Length)
-            //            {
-            //                tableMiddleLine = tableMiddleLine.Remove(mapEmptyChar[i], 1);
-            //            }
-
-            //            if (mapEmptyChar[i] < tableBottomLine.Length)
-            //            {
-            //                tableBottomLine = tableBottomLine.Remove(mapEmptyChar[i], 1);
-            //            }
-            //        }
-            //    }
-            //}
 
             // find the longest formatted line
             //var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(tableRowContentFormat, row.ToArray()).Length) : 0);
@@ -614,13 +525,16 @@ namespace ConsoleTableExt
                     }                    
                 }
 
+                var headerSlices = builder.Column.ToArray();
+                var formattedHeaderSlice = Enumerable.Range(0, headerSlices.Length).Select(idx => builder.FormatterStore.ContainsKey(idx) ? builder.FormatterStore[idx](headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()) : headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()).ToArray();
+
                 if (headerRowContentFormat != null && headerRowContentFormat.Trim().Length > 0)
                 {
-                    strBuilder.AppendLine(string.Format(headerRowContentFormat, builder.Column.ToArray()));
+                    strBuilder.AppendLine(string.Format(headerRowContentFormat, formattedHeaderSlice));
                 }
                 else
                 {
-                    strBuilder.AppendLine(string.Format(tableRowContentFormat, builder.Column.ToArray()));
+                    strBuilder.AppendLine(string.Format(tableRowContentFormat, formattedHeaderSlice));
                 }
             }
             //else
@@ -630,7 +544,13 @@ namespace ConsoleTableExt
             //}
 
             // add each row
-            var results = builder.Rows.Select(row => string.Format(tableRowContentFormat, row.ToArray())).ToList();
+
+            //var results = builder.Rows.Select(row => {
+            //    var rowSlices = row.ToArray();
+            //    return string.Format(tableRowContentFormat, Enumerable.Range(0, rowSlices.Length).Select(idx => builder.FormatterStore.ContainsKey(idx) ? builder.FormatterStore[idx](rowSlices[idx] == null ? string.Empty : rowSlices[idx].ToString()) : rowSlices[idx] == null ? string.Empty : rowSlices[idx].ToString()).ToArray());
+            //}).ToList();
+
+            var results = builder.FormattedRows.Select(row => string.Format(tableRowContentFormat, row.ToArray())).ToList();
 
             var isFirstRow = true;
             foreach (var row in results)
