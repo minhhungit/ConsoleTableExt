@@ -43,13 +43,13 @@ namespace ConsoleTableExt.Tests
                 .WithFormat(ConsoleTableBuilderFormat.Minimal)
                 .Export();
 
-            Assert.IsTrue(strBuilder.ToString() == @"Name            Position                       Office         Age  Start Date              
--------------------------------------------------------------------------------------------
-Airi Satou      Accountant                     Tokyo          33   5/9/2017 12:00:00 AM    
-Angelica Ramos  Chief Executive Officer (CEO)  New York       47   1/12/2017 12:00:00 AM   
-Ashton Cox      Junior Technical Author        London         46   4/2/2017 12:00:00 AM    
-Bradley Greer   Software Engineer              San Francisco  28   11/15/2017 12:00:00 AM  
-".TrimStart());
+            Assert.IsTrue(strBuilder.ToString() == @"Name           Position                      Office        Age Start Date             
+--------------------------------------------------------------------------------------
+Airi Satou     Accountant                    Tokyo         33  5/9/2017 12:00:00 AM   
+Angelica Ramos Chief Executive Officer (CEO) New York      47  1/12/2017 12:00:00 AM  
+Ashton Cox     Junior Technical Author       London        46  4/2/2017 12:00:00 AM   
+Bradley Greer  Software Engineer             San Francisco 28  11/15/2017 12:00:00 AM 
+");
 
             var lines = strBuilder.ToString().Split('\n');
             Assert.IsTrue(lines.Length == 7);
