@@ -12,9 +12,10 @@ namespace ConsoleTableExt
         BottomLeft,
         BottomCenter,
         BottomRight,
-        BorderXTop,
-        BorderXBottom,
-        BorderY,
+        BorderTop,
+        BorderRight,
+        BorderBottom,
+        BorderLeft,        
         Divider,
     }
 }
