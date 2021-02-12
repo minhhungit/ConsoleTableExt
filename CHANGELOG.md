@@ -1,3 +1,6 @@
+## 3.1.2 (2021-02-12)
+- fix title coloring issue when using table alignment center/right
+
 ## 3.1.1 (2021-02-12)
 - fix bug table alignment
 
