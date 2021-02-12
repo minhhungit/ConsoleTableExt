@@ -1,3 +1,15 @@
+## 3.1.0 (2021-02-12)
+- add test project
+- allow custom BorderLeft, BorderRight, BorderTop, BorderBottom
+- re-implement custom format builder
+- color table title (text color & background color)
+- replace old formats (markdown, alternative ...) by CustomFormat builder
+- Trim table line/border/divider if all chars are space
+- allow custom padding left, padding right of cell content
+- rename some variables
+- fix bug: allow using title on old formats
+- add new method .WithFormatter, allow user re-format content/header value
+
 ## 3.0.0 (2021-01-31)
 - support Table alignment (left, center and right)
 - implement table ChartMap to support box-drawing characters and header ChartMap
