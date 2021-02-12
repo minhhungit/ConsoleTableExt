@@ -465,7 +465,7 @@ namespace ConsoleTableExt
 
         public static void ExportAndWriteLine(this ConsoleTableBuilder builder, TableAligntment alignment = TableAligntment.Left)
         {
-            builder.ExportAndWrite();
+            builder.ExportAndWrite(alignment);
             Console.Write('\n');
         }
                 

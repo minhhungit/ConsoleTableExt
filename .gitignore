@@ -20,3 +20,5 @@
 /ConsoleTableExt.Tests/bin/Debug
 /ConsoleTableExt.Tests/obj/Debug
 /packages
+/ConsoleTableExt.Tests/bin/Release
+/ConsoleTableExt.Tests/obj/Release

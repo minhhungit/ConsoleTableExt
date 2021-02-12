@@ -1,3 +1,6 @@
+## 3.1.1 (2021-02-12)
+- fix bug table alignment
+
 ## 3.1.0 (2021-02-12)
 - add test project
 - allow custom BorderLeft, BorderRight, BorderTop, BorderBottom
