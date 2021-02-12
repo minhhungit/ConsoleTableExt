@@ -6,7 +6,7 @@ A library to print out a nicely formatted table in a console application C#
 > Install-Package ConsoleTableExt
 
 ### Feature
-
+- Support [box-drawing characters](https://en.wikipedia.org/wiki/Box-drawing_character)
 - Table alignment (left right and center)
 - Column alignment (left/right)
 - Table can have TITLE, can change text color and background color of title
