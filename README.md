@@ -24,14 +24,24 @@ ConsoleTableBuilder
 // Advanced table 
 ConsoleTableBuilder
     .From(tableData)
-    .WithTitle("CONTACTS ")
+    .WithTitle("CONTACTS ", ConsoleColor.Yellow, ConsoleColor.DarkGray)
     .WithColumn("Id", "First Name", "Sur Name")
-    .WithCharMapDefinition(new Dictionary<CharMapPositions, char> {                   
+    .WithMinLength(new Dictionary<int, int> {
+        { 1, 25 },
+        { 2, 25 }
+    })
+    .WithTextAlignment(new Dictionary<int, TextAligntment>
+    {
+        {2, TextAligntment.Right }
+    })
+    .WithCharMapDefinition(new Dictionary<CharMapPositions, char> {
         {CharMapPositions.BottomLeft, '=' },
         {CharMapPositions.BottomCenter, '=' },
         {CharMapPositions.BottomRight, '=' },
-        {CharMapPositions.BorderX, '=' },
-        {CharMapPositions.BorderY, '|' },
+        {CharMapPositions.BorderTop, '=' },
+        {CharMapPositions.BorderBottom, '=' },
+        {CharMapPositions.BorderLeft, '|' },
+        {CharMapPositions.BorderRight, '|' },
         {CharMapPositions.DividerY, '|' },
     })
     .WithHeaderCharMapDefinition(new Dictionary<HeaderCharMapPositions, char> {
@@ -42,11 +52,12 @@ ConsoleTableBuilder
         {HeaderCharMapPositions.BottomCenter, '-' },
         {HeaderCharMapPositions.BottomRight, '|' },
         {HeaderCharMapPositions.Divider, '|' },
-        {HeaderCharMapPositions.BorderXTop, '=' },
-        {HeaderCharMapPositions.BorderXBottom, '-' },
-        {HeaderCharMapPositions.BorderY, '|' },
+        {HeaderCharMapPositions.BorderTop, '=' },
+        {HeaderCharMapPositions.BorderBottom, '-' },
+        {HeaderCharMapPositions.BorderLeft, '|' },
+        {HeaderCharMapPositions.BorderRight, '|' },
     })
-    .ExportAndWriteLine();
+    .ExportAndWriteLine(TableAligntment.Right);
 ```
 
 <img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/demo1.png" style="width: 100%;" />
