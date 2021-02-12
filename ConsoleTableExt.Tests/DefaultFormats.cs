@@ -16,6 +16,7 @@ namespace ConsoleTableExt.Tests
                 .From(SampleData.SampleTableData)
                 .Export();
 
+            TestContext.Out.WriteLine(strBuilder.ToString());
             Assert.IsTrue(strBuilder.ToString() == @"
 -------------------------------------------------------------------------------------------------
 | Name           | Position                      | Office        | Age | Start Date             |
