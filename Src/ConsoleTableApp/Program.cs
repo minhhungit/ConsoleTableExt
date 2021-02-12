@@ -11,22 +11,6 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
-            ConsoleTableBuilder.From(SampleListData)
-                .WithTextAlignment(new Dictionary<int, TextAligntment> {
-                    { 1, TextAligntment.Right },
-                    { 3, TextAligntment.Right },
-                    { 100, TextAligntment.Right }
-                })
-                .WithMinLength(new Dictionary<int, int> {
-                    { 1, 30 }
-                })
-                .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
-                .WithTitle("HELLO I AM TITLE", ConsoleColor.Green, ConsoleColor.DarkGray)
-                .WithFormatter(1, (text) => {
-                    return text.ToUpper().Replace(" ", "-") + " «";
-                })
-                .ExportAndWriteLine(TableAligntment.Center);
-
             ConsoleTableBuilder.From(new List<object[]>
             {
                 new object[] { "s" }
@@ -90,7 +74,7 @@ namespace ConsoleTableApp
                     { 100, TextAligntment.Right }
                 })
                 .WithMinLength(new Dictionary<int, int> {
-                    {1, 50}
+                    {1, 35}
                 })
                 .WithFormatter(2, (text) => {
                     char[] chars = text.ToCharArray();

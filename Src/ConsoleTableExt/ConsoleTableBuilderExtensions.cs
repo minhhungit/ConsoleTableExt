@@ -403,7 +403,7 @@ namespace ConsoleTableExt
             for (int i = 0; i < linesCount; i++)
             {
                 var row = string.Empty;
-
+                
                 switch (alignment)
                 {
                     case TableAligntment.Left:
@@ -424,15 +424,17 @@ namespace ConsoleTableExt
                     && builder.TitlePositionStartAt > 0
                     && builder.TitlePositionLength > 0)
                 {
-                    Console.Write(row.Substring(0, builder.TitlePositionStartAt));
+                    var newTitlePositionStartAt = builder.TitlePositionStartAt + (row.Length - lines[i].Length); 
+
+                    Console.Write(row.Substring(0, newTitlePositionStartAt));
                     Console.ForegroundColor = builder.TableTitleColor.ForegroundColor;
                     if (!builder.TableTitleColor.IsBackgroundColorNull)
                     {
                         Console.BackgroundColor = builder.TableTitleColor.BackgroundColor;
                     }
-                    Console.Write(row.Substring(builder.TitlePositionStartAt, builder.TitlePositionLength));
+                    Console.Write(row.Substring(newTitlePositionStartAt, builder.TitlePositionLength));
                     Console.ResetColor();
-                    Console.Write(row.Substring(builder.TitlePositionStartAt + builder.TitlePositionLength, row.Length - (builder.TitlePositionStartAt + builder.TitlePositionLength)));
+                    Console.Write(row.Substring(newTitlePositionStartAt + builder.TitlePositionLength, row.Length - (newTitlePositionStartAt + builder.TitlePositionLength)));
                     Console.Write('\n');
                 }
                 else
