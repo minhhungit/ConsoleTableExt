@@ -29,13 +29,21 @@ var tableData = new List<List<object>>
     new List<object>{ "Shad Decker", "Regional Director", "Edinburgh"},
 };
 
-// Simple table
+Console.WriteLine();
+Console.WriteLine("=> Simple example with default format:".ToUpper());
 ConsoleTableBuilder
     .From(tableData)
     .ExportAndWriteLine();
 
+Console.WriteLine();
+Console.WriteLine("=> More example with existing format Alternative:".ToUpper());
+ConsoleTableBuilder
+    .From(tableData)
+    .WithFormat(ConsoleTableBuilderFormat.Alternative)
+    .ExportAndWriteLine(TableAligntment.Center);
 
-// Advanced table 
+Console.WriteLine();
+Console.WriteLine("=> Advance example with custom format using CharMap:".ToUpper());
 ConsoleTableBuilder
     .From(tableData)
     .WithTitle("CONTACTS ", ConsoleColor.Yellow, ConsoleColor.DarkGray)
