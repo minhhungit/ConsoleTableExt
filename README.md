@@ -102,6 +102,9 @@ Check more demo here https://github.com/minhhungit/ConsoleTableExt/blob/master/S
 
 <img src="https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/HeaderCharMapPositions.png" style="width: 100%;" />
 
+
+**There are many ways to contribute to ConsoleTableExt, either contribute issue/code directly or buy me a cup of coffee**
+
 <a href='https://ko-fi.com/I2I13GAGL' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi4.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ### Inspired by 
