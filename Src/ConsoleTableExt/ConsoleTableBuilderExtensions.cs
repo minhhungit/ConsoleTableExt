@@ -65,18 +65,18 @@ namespace ConsoleTableExt
                 case MetaRowPositions.Top:
                     if (builder.TopMetadataRows == null)
                     {
-                        builder.TopMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+                        builder.TopMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
                     }
 
-                    builder.TopMetadataRows.Add(new KeyValuePair<MetaRowPositions, string>(position, contentGenerator.Invoke(builder)));
+                    builder.TopMetadataRows.Add(new KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>(position, contentGenerator));
                     break;
                 case MetaRowPositions.Bottom:
                     if (builder.BottomMetadataRows == null)
                     {
-                        builder.BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+                        builder.BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
                     }
 
-                    builder.BottomMetadataRows.Add(new KeyValuePair<MetaRowPositions, string>(position, contentGenerator.Invoke(builder)));
+                    builder.BottomMetadataRows.Add(new KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>(position, contentGenerator));
                     break;
 
                 default:
@@ -808,7 +808,10 @@ namespace ConsoleTableExt
                     {
                         foreach (var item in builder.TopMetadataRows)
                         {
-                            result.Add(item.Value);
+                            if (item.Value != null)
+                            {
+                                result.Add(item.Value.Invoke(builder));
+                            }
                         }
                     }
                     break;
@@ -817,7 +820,10 @@ namespace ConsoleTableExt
                     {
                         foreach (var item in builder.BottomMetadataRows)
                         {
-                            result.Add(item.Value);
+                            if (item.Value != null)
+                            {
+                                result.Add(item.Value.Invoke(builder));
+                            }                                
                         }
                     }
                     break;

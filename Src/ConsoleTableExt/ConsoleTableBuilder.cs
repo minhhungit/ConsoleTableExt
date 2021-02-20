@@ -16,8 +16,8 @@ namespace ConsoleTableExt
         internal ConsoleTableBuilderFormat TableFormat { get; set; }
         internal Dictionary<CharMapPositions, char> CharMapPositionStore { get; set; } = null;
         internal Dictionary<HeaderCharMapPositions, char> HeaderCharMapPositionStore { get; set; } = null;
-        internal List<KeyValuePair<MetaRowPositions, string>> TopMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
-        internal List<KeyValuePair<MetaRowPositions, string>> BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, string>>();
+        internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> TopMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
+        internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
         internal Dictionary<int, string> TextAligmentData = new Dictionary<int, string>();
         internal Dictionary<int, int> MinLengthData = new Dictionary<int, int>();
 
