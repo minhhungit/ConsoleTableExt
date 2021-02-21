@@ -1,3 +1,7 @@
+## 3.1.3 (2021-02-21)
+- meta rows should be invoked when table is building
+- table title alignment (left/right/center)
+
 ## 3.1.2 (2021-02-12)
 - fix title coloring issue when using table alignment center/right
 
