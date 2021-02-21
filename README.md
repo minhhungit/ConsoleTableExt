@@ -8,11 +8,11 @@ A library to print out a nicely formatted table in a console application C#
 ### Feature
 - Support [box-drawing characters](https://en.wikipedia.org/wiki/Box-drawing_character)
 - Table alignment (left right and center)
-- Column alignment (left/right)
+- Column alignment (left/right/center)
 - Table can have TITLE, can change text color and background color of title, support title alignment (left/right/center)
 - Support power char-map, strong customization ability
 - Contain some popular formas like Markdown table...
-- Support text formatter
+- Support text formatter (include header)
 - Support many kind data type: DataTable, List<object>...
 - Support metadata row (placed at top or bottom of table)
 - Column min-length 
