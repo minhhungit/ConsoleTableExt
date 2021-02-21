@@ -9,7 +9,7 @@ A library to print out a nicely formatted table in a console application C#
 - Support [box-drawing characters](https://en.wikipedia.org/wiki/Box-drawing_character)
 - Table alignment (left right and center)
 - Column alignment (left/right)
-- Table can have TITLE, can change text color and background color of title
+- Table can have TITLE, can change text color and background color of title, support title alignment (left/right/center)
 - Support power char-map, strong customization ability
 - Contain some popular formas like Markdown table...
 - Support text formatter
