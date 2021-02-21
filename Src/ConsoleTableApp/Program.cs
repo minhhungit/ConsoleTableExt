@@ -50,6 +50,7 @@ namespace ConsoleTableApp
             ConsoleTableBuilder.From(SampleListData)
                 //.WithFormat(ConsoleTableBuilderFormat.MarkDown)
                 .WithTextAlignment(new Dictionary<int, TextAligntment> {
+                    { 0, TextAligntment.Center },
                     { 1, TextAligntment.Right },
                     { 3, TextAligntment.Right },
                     { 100, TextAligntment.Right }
@@ -59,9 +60,10 @@ namespace ConsoleTableApp
                 })
                 .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
                 .WithTitle("HELLO I AM TITLE", ConsoleColor.Green, ConsoleColor.DarkGray, TitleAligntment.Right)
-                .WithFormatter(1, (text)=> {
+                .WithFormatter(1, (text) =>
+                {
                     return text.ToUpper().Replace(" ", "-") + " «";
-                })                
+                })
                 .ExportAndWriteLine(TableAligntment.Center);
 
             _____________________________PrintDemoDivider();
@@ -69,12 +71,14 @@ namespace ConsoleTableApp
             Console.WriteLine("Text alignment and column min length");
             ConsoleTableBuilder.From(SampleTableData())
                 .WithTextAlignment(new Dictionary<int, TextAligntment> {
+                    { 0, TextAligntment.Center },
                     { 1, TextAligntment.Right },
-                    { 3, TextAligntment.Right },
+                    { 3, TextAligntment.Center },
                     { 100, TextAligntment.Right }
                 })
                 .WithMinLength(new Dictionary<int, int> {
-                    {1, 35}
+                    { 1, 35 },
+                    { 3, 10 }
                 })
                 .WithFormatter(2, (text) => {
                     char[] chars = text.ToCharArray();
@@ -92,7 +96,8 @@ namespace ConsoleTableApp
                     {
                         return text + " $";
                     }
-                }, true)
+                })
+                .WithColumnFormatter(3, (text)=> "#")
                 .ExportAndWriteLine();
 
             _____________________________PrintDemoDivider();

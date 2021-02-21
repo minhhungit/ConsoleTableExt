@@ -20,3 +20,5 @@ static void Main(string[] args)
 	}
 	Console.WriteLine("Hello World!");
 }
+
+// https://www.jerriepelser.com/blog/using-ansi-color-codes-in-net-console-apps/

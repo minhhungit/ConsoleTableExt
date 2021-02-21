@@ -18,7 +18,7 @@ namespace ConsoleTableExt
         internal Dictionary<HeaderCharMapPositions, char> HeaderCharMapPositionStore { get; set; } = null;
         internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> TopMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
         internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
-        internal Dictionary<int, string> TextAligmentData = new Dictionary<int, string>();
+        internal Dictionary<int, TextAligntment> TextAligmentData = new Dictionary<int, TextAligntment>();
         internal Dictionary<int, int> MinLengthData = new Dictionary<int, int>();
 
         internal bool CanTrimColumn = false;
@@ -32,7 +32,7 @@ namespace ConsoleTableExt
         internal int TitlePositionLength { get; set; }
 
         internal Dictionary<int, Func<string, string>> FormatterStore = new Dictionary<int, Func<string, string>>();
-        internal Dictionary<int, bool> FormatterHeaderFlags = new Dictionary<int, bool>();
+        internal Dictionary<int, Func<string, string>> ColumnFormatterStore = new Dictionary<int, Func<string, string>>();
 
         private ConsoleTableBuilder()
         {
@@ -174,9 +174,9 @@ namespace ConsoleTableExt
             FormattedColumns = Enumerable.Range(0, Column.Count)
                 .Select(idx =>
                 {
-                    if (FormatterHeaderFlags.ContainsKey(idx) && FormatterHeaderFlags[idx] && FormatterStore.ContainsKey(idx))
+                    if (ColumnFormatterStore.ContainsKey(idx))
                     {
-                        return FormatterStore[idx](Column[idx] == null ? string.Empty : Column[idx].ToString());
+                        return ColumnFormatterStore[idx](Column[idx] == null ? string.Empty : Column[idx].ToString());
                     }
                     else
                     {
@@ -203,10 +203,53 @@ namespace ConsoleTableExt
             }
         }
 
+        internal void CenterRowContent(List<int> columnLengths)
+        {
+            for (int i = 0; i < FormattedRows.Count; i++)
+            {
+                for (int j = 0; j < FormattedRows[i].Count; j++)
+                {
+                    if (TextAligmentData.ContainsKey(j) && TextAligmentData[j] == TextAligntment.Center)
+                    {
+                        FormattedRows[i][j] = CenteredString(FormattedRows[i][j], columnLengths[j]);
+                    }                    
+                }
+            }
+        }
+
+        internal string[] CenterColumnContent(string[] columnSlices, List<int> columnLengths)
+        {
+            for (int i = 0; i < columnSlices.Length; i++)
+            {
+                if (TextAligmentData.ContainsKey(i) && TextAligmentData[i] == TextAligntment.Center)
+                {
+                    columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
+                }
+            }
+
+            return columnSlices;
+        }
+
+        private string CenteredString(object s, int width)
+        {
+            if (s == null)
+            {
+                return null;
+            }
+
+            if (s.ToString().Length >= width)
+            {
+                return s.ToString();
+            }
+
+            int leftPadding = (width - s.ToString().Length) / 2;
+            int rightPadding = width - s.ToString().Length - leftPadding;
+
+            return new string(' ', leftPadding) + s + new string(' ', rightPadding);
+        }
+
         internal List<int> GetCadidateColumnLengths()
         {
-            PopulateFormattedColumnsRows();
-
             var columnLengths = new List<int>();
 
             var numberOfColumns = 0;
@@ -410,7 +453,15 @@ namespace ConsoleTableExt
             if (columnLengths.Count > 0)
             {
                 var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => PaddingLeft + "{" + i + "," + (TextAligmentData == null ? "-" : (TextAligmentData.ContainsKey(i) ? TextAligmentData[i].ToString() : "-")) + columnLengths[i] + "}" + PaddingRight)
+                            .Select(i =>
+                            {
+                                var alignmentChar = string.Empty;
+                                if (TextAligmentData == null || !TextAligmentData.ContainsKey(i) || TextAligmentData[i] == TextAligntment.Left)
+                                {
+                                    alignmentChar = "-";
+                                }
+                                return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
+                            })
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : divider.ToString()) + a);
 
                 var line = (CanRemoveBorderLeft() ? string.Empty : borderLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : borderRight.ToString());
@@ -524,7 +575,15 @@ namespace ConsoleTableExt
             if (columnLengths.Count > 0)
             {
                 var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => PaddingLeft + "{" + i + "," + (TextAligmentData == null ? "-" : (TextAligmentData.ContainsKey(i) ? TextAligmentData[i].ToString() : "-")) + columnLengths[i] + "}" + PaddingRight)
+                            .Select(i => {
+                                var alignmentChar = string.Empty;
+                                if (TextAligmentData == null || !TextAligmentData.ContainsKey(i) || TextAligmentData[i] == TextAligntment.Left)
+                                {
+                                    alignmentChar = "-";
+                                }
+
+                                return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
+                            })
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : divider.ToString()) + a);
 
                 var line = (CanRemoveBorderLeft() ? string.Empty : borderLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : borderRight.ToString());

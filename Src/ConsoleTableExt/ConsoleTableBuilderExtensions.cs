@@ -142,7 +142,7 @@ namespace ConsoleTableExt
             return builder;
         }
 
-        public static ConsoleTableBuilder WithFormatter(this ConsoleTableBuilder builder, int columnIndex, Func<string, string> formatter, bool includeHeaderIfHas = false)
+        public static ConsoleTableBuilder WithFormatter(this ConsoleTableBuilder builder, int columnIndex, Func<string, string> formatter)
         {
             if (!builder.FormatterStore.ContainsKey(columnIndex))
             {
@@ -153,13 +153,18 @@ namespace ConsoleTableExt
                 builder.FormatterStore[columnIndex] = formatter;
             }
 
-            if (!builder.FormatterHeaderFlags.ContainsKey(columnIndex))
+            return builder;
+        }
+
+        public static ConsoleTableBuilder WithColumnFormatter(this ConsoleTableBuilder builder, int columnIndex, Func<string, string> formatter)
+        {
+            if (!builder.ColumnFormatterStore.ContainsKey(columnIndex))
             {
-                builder.FormatterHeaderFlags.Add(columnIndex, includeHeaderIfHas);
+                builder.ColumnFormatterStore.Add(columnIndex, formatter);
             }
             else
             {
-                builder.FormatterHeaderFlags[columnIndex] = includeHeaderIfHas;
+                builder.ColumnFormatterStore[columnIndex] = formatter;
             }
 
             return builder;
@@ -175,12 +180,7 @@ namespace ConsoleTableExt
         {
             if (alignmentData != null)
             {
-                builder.TextAligmentData = new Dictionary<int, string>();
-
-                foreach (var item in alignmentData)
-                {
-                    builder.TextAligmentData.Add(item.Key, item.Value == TextAligntment.Left ? "-" : string.Empty);
-                }
+                builder.TextAligmentData = alignmentData;
             }
 
             return builder;
@@ -483,6 +483,7 @@ namespace ConsoleTableExt
 
             builder.PopulateFormattedColumnsRows();
             var columnLengths = builder.GetCadidateColumnLengths();
+            builder.CenterRowContent(columnLengths);
 
             var filledMap = FillCharMap(builder.CharMapPositionStore);
             var filledHeaderMap = FillHeaderCharMap(builder.HeaderCharMapPositionStore);
@@ -513,7 +514,7 @@ namespace ConsoleTableExt
             // find the longest formatted line
             //var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(tableRowContentFormat, row.ToArray()).Length) : 0);
 
-            var hasHeader = builder.Column != null && builder.Column.Any() && builder.Column.Max(x => (x ?? string.Empty).ToString().Length) > 0 ;
+            var hasHeader = builder.FormattedColumns != null && builder.FormattedColumns.Any() && builder.FormattedColumns.Max(x => (x ?? string.Empty).ToString().Length) > 0 ;
             
             // header
             if (hasHeader)
@@ -530,8 +531,10 @@ namespace ConsoleTableExt
                     }                    
                 }
 
-                var headerSlices = builder.Column.ToArray();
-                var formattedHeaderSlice = Enumerable.Range(0, headerSlices.Length).Select(idx => builder.FormatterStore.ContainsKey(idx) ? builder.FormatterStore[idx](headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()) : headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()).ToArray();
+                var headerSlices = builder.FormattedColumns.ToArray();
+                var formattedHeaderSlice = Enumerable.Range(0, headerSlices.Length).Select(idx => builder.ColumnFormatterStore.ContainsKey(idx) ? builder.ColumnFormatterStore[idx](headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()) : headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()).ToArray();
+
+                formattedHeaderSlice = builder.CenterColumnContent(formattedHeaderSlice, columnLengths);
 
                 if (headerRowContentFormat != null && headerRowContentFormat.Trim().Length > 0)
                 {
@@ -545,7 +548,7 @@ namespace ConsoleTableExt
             //else
             //{
             //    if (beginTableFormat.Length > 0) strBuilder.AppendLine(beginTableFormat);
-            //    strBuilder.AppendLine(string.Format(rowContentTableFormat, builder.Column.ToArray()));
+            //    strBuilder.AppendLine(string.Format(rowContentTableFormat, builder.FormattedColumns.ToArray()));
             //}
 
             // add each row
