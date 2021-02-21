@@ -92,9 +92,10 @@ namespace ConsoleTableExt
         /// <param name="builder"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title)
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, TitleAligntment titleAligntment = TitleAligntment.Center)
         {
             builder.TableTitle = title;
+            builder.TableTitleTextAlignment = titleAligntment;
             return builder;
         }
 
@@ -105,10 +106,11 @@ namespace ConsoleTableExt
         /// <param name="title"></param>
         /// <param name="foregroundColor">text color</param>
         /// <returns></returns>
-        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor)
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, TitleAligntment titleAligntment = TitleAligntment.Center)
         {
             builder.TableTitle = title;
             builder.TableTitleColor = new ConsoleColorNullable(foregroundColor);
+            builder.TableTitleTextAlignment = titleAligntment;
             return builder;
         }
 
@@ -120,10 +122,11 @@ namespace ConsoleTableExt
         /// <param name="foregroundColor">text color</param>
         /// <param name="backgroundColor">background color</param>
         /// <returns></returns>
-        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, ConsoleColor backgroundColor, TitleAligntment titleAligntment = TitleAligntment.Center)
         {
             builder.TableTitle = title;
             builder.TableTitleColor = new ConsoleColorNullable(foregroundColor, backgroundColor);
+            builder.TableTitleTextAlignment = titleAligntment;
             return builder;
         }
 
