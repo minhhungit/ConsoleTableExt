@@ -22,3 +22,4 @@ static void Main(string[] args)
 }
 
 // https://www.jerriepelser.com/blog/using-ansi-color-codes-in-net-console-apps/
+// https://en.wikipedia.org/wiki/ANSI_escape_code
