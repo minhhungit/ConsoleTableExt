@@ -1,3 +1,9 @@
+## 3.1.4 (2021-02-22)
+- support text alignment center
+- change order of items in enum TableAligntment
+- remove titleAlignment (use TextAlignment instead)
+- restructure project
+
 ## 3.1.3 (2021-02-21)
 - meta rows should be invoked when table is building
 - table title alignment (left/right/center)
