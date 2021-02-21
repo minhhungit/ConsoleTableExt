@@ -59,7 +59,7 @@ namespace ConsoleTableApp
                     { 1, 30 }
                 })
                 .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
-                .WithTitle("HELLO I AM TITLE", ConsoleColor.Green, ConsoleColor.DarkGray, TitleAligntment.Right)
+                .WithTitle("HELLO I AM TITLE", ConsoleColor.Green, ConsoleColor.DarkGray, TextAligntment.Right)
                 .WithFormatter(1, (text) =>
                 {
                     return text.ToUpper().Replace(" ", "-") + " «";

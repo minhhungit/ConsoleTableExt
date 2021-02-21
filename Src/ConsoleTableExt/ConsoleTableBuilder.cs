@@ -23,7 +23,7 @@ namespace ConsoleTableExt
 
         internal bool CanTrimColumn = false;
         internal string TableTitle = string.Empty;
-        internal TitleAligntment TableTitleTextAlignment = TitleAligntment.Center;
+        internal TextAligntment TableTitleTextAlignment = TextAligntment.Center;
         internal ConsoleColorNullable TableTitleColor = new ConsoleColorNullable();
         internal string PaddingLeft = " ";
         internal string PaddingRight = " ";
@@ -387,13 +387,13 @@ namespace ConsoleTableExt
                 var startPoint = 0;
                 switch (TableTitleTextAlignment)
                 {
-                    case TitleAligntment.Left:
+                    case TextAligntment.Left:
                         startPoint = 1;                        
                         break;
-                    case TitleAligntment.Right:
+                    case TextAligntment.Right:
                         startPoint = line.Length - 1 - TableTitle.Length;
                         break;
-                    case TitleAligntment.Center:
+                    case TextAligntment.Center:
                         startPoint = (line.Length - TableTitle.Length) / 2;
                         break;
                     default:

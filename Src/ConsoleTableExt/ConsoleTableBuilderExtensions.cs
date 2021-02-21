@@ -92,7 +92,7 @@ namespace ConsoleTableExt
         /// <param name="builder"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, TitleAligntment titleAligntment = TitleAligntment.Center)
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, TextAligntment titleAligntment = TextAligntment.Center)
         {
             builder.TableTitle = title;
             builder.TableTitleTextAlignment = titleAligntment;
@@ -106,7 +106,7 @@ namespace ConsoleTableExt
         /// <param name="title"></param>
         /// <param name="foregroundColor">text color</param>
         /// <returns></returns>
-        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, TitleAligntment titleAligntment = TitleAligntment.Center)
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, TextAligntment titleAligntment = TextAligntment.Center)
         {
             builder.TableTitle = title;
             builder.TableTitleColor = new ConsoleColorNullable(foregroundColor);
@@ -122,7 +122,7 @@ namespace ConsoleTableExt
         /// <param name="foregroundColor">text color</param>
         /// <param name="backgroundColor">background color</param>
         /// <returns></returns>
-        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, ConsoleColor backgroundColor, TitleAligntment titleAligntment = TitleAligntment.Center)
+        public static ConsoleTableBuilder WithTitle(this ConsoleTableBuilder builder, string title, ConsoleColor foregroundColor, ConsoleColor backgroundColor, TextAligntment titleAligntment = TextAligntment.Center)
         {
             builder.TableTitle = title;
             builder.TableTitleColor = new ConsoleColorNullable(foregroundColor, backgroundColor);
