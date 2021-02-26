@@ -15,7 +15,8 @@ namespace ConsoleTableApp
             {
                 new object[] { "s" }
             })
-                .WithTitle("abcdefghlm")
+                .WithTitle(new TableTitle("abcdefghlm"))
+                .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
                 .ExportAndWriteLine();
 
             _____________________________PrintDemoDivider();
@@ -38,7 +39,7 @@ namespace ConsoleTableApp
             var strBuilder02 =
                    ConsoleTableBuilder
                    .From(SampleTableData())
-                   .WithTitle("MARKDOWN WITH TITLE ???")
+                   .WithTitle(new TableTitle("MARKDOWN WITH TITLE ???"))
                    .WithPaddingLeft(string.Empty)
                    .WithFormat(ConsoleTableBuilderFormat.MarkDown)
                    .Export();
@@ -59,7 +60,7 @@ namespace ConsoleTableApp
                     { 1, 30 }
                 })
                 .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
-                .WithTitle("HELLO I AM TITLE", ConsoleColor.Green, ConsoleColor.DarkGray, TextAligntment.Right)
+                .WithTitle(new TableTitle("HELLO I AM TITLE", "\u001b[31m", "\u001b[0m"), TextAligntment.Right)
                 .WithFormatter(1, (text) =>
                 {
                     return text.ToUpper().Replace(" ", "-") + " «";
@@ -80,14 +81,16 @@ namespace ConsoleTableApp
                     { 1, 35 },
                     { 3, 10 }
                 })
-                .WithFormatter(2, (text) => {
+                .WithFormatter(2, (text) =>
+                {
                     char[] chars = text.ToCharArray();
                     Array.Reverse(chars);
                     return new String(chars);
                 })
-                .WithTitle("Hello, everyone! This is the LONGEST TEXT EVER! I was inspired by the various other 'longest texts ever' on the internet, and I wanted to make my own. So here it is!".ToUpper(), ConsoleColor.Yellow, ConsoleColor.DarkMagenta)
+                .WithTitle(new TableTitle("Hello, everyone! This is the LONGEST TEXT EVER! I was inspired by the various other 'longest texts ever' on the internet, and I wanted to make my own. So here it is!".ToUpper(), "\u001b[31m", "\u001b[0m"))
                 .WithCharMapDefinition(CharMapDefinition.FrameDoublePipDefinition)
-                .WithFormatter(3, (text) => {
+                .WithFormatter(3, (text) =>
+                {
                     if (string.IsNullOrEmpty(text) || text.Trim().Length == 0)
                     {
                         return "0 $";
@@ -97,7 +100,7 @@ namespace ConsoleTableApp
                         return text + " $";
                     }
                 })
-                .WithColumnFormatter(3, (text)=> "#")
+                .WithColumnFormatter(3, (text) => "#")
                 .ExportAndWriteLine();
 
             _____________________________PrintDemoDivider();
@@ -106,18 +109,18 @@ namespace ConsoleTableApp
             ConsoleTableBuilder.From(SampleTableData())
                 .WithCharMapDefinition(
                     CharMapDefinition.FramePipDefinition,
-                    new Dictionary<HeaderCharMapPositions, char> {
-                        {HeaderCharMapPositions.TopLeft, '╒' },
-                        {HeaderCharMapPositions.TopCenter, '╤' },
-                        {HeaderCharMapPositions.TopRight, '╕' },
-                        {HeaderCharMapPositions.BottomLeft, '╞' },
-                        {HeaderCharMapPositions.BottomCenter, '╪' },
-                        {HeaderCharMapPositions.BottomRight, '╡' },
-                        {HeaderCharMapPositions.BorderTop, '═' },
-                        {HeaderCharMapPositions.BorderRight, '│' },
-                        {HeaderCharMapPositions.BorderBottom, '═' },
-                        {HeaderCharMapPositions.BorderLeft, '│' },
-                        {HeaderCharMapPositions.Divider, '│' },
+                    new Dictionary<HeaderCharMapPositions, MapCharItem> {
+                        {HeaderCharMapPositions.TopLeft, new MapCharItem('╒') },
+                        {HeaderCharMapPositions.TopCenter, new MapCharItem('╤') },
+                        {HeaderCharMapPositions.TopRight, new MapCharItem('╕') },
+                        {HeaderCharMapPositions.BottomLeft, new MapCharItem('╞') },
+                        {HeaderCharMapPositions.BottomCenter, new MapCharItem('╪') },
+                        {HeaderCharMapPositions.BottomRight, new MapCharItem('╡') },
+                        {HeaderCharMapPositions.BorderTop, new MapCharItem('═') },
+                        {HeaderCharMapPositions.BorderRight, new MapCharItem('│') },
+                        {HeaderCharMapPositions.BorderBottom, new MapCharItem('═') },
+                        {HeaderCharMapPositions.BorderLeft, new MapCharItem('│') },
+                        {HeaderCharMapPositions.Divider, new MapCharItem('│') },
                     })
                 .ExportAndWriteLine(TableAligntment.Right);
 
@@ -128,18 +131,18 @@ namespace ConsoleTableApp
                 .WithCharMapDefinition(CharMapDefinition.FramePipDefinition)
                 .WithCharMapDefinition(
                     CharMapDefinition.FramePipDefinition,
-                    new Dictionary<HeaderCharMapPositions, char> {
-                        {HeaderCharMapPositions.TopLeft, '╒' },
-                        {HeaderCharMapPositions.TopCenter, '═' },
-                        {HeaderCharMapPositions.TopRight, '╕' },
-                        {HeaderCharMapPositions.BottomLeft, '╞' },
-                        {HeaderCharMapPositions.BottomCenter, '╤' },
-                        {HeaderCharMapPositions.BottomRight, '╡' },
-                        {HeaderCharMapPositions.BorderTop, '═' },
-                        {HeaderCharMapPositions.BorderRight, '│' },
-                        {HeaderCharMapPositions.BorderBottom, '═' },
-                        {HeaderCharMapPositions.BorderLeft, '│' },
-                        {HeaderCharMapPositions.Divider, ' ' },
+                    new Dictionary<HeaderCharMapPositions, MapCharItem> {
+                        {HeaderCharMapPositions.TopLeft, new MapCharItem('╒') },
+                        {HeaderCharMapPositions.TopCenter, new MapCharItem('═') },
+                        {HeaderCharMapPositions.TopRight, new MapCharItem('╕') },
+                        {HeaderCharMapPositions.BottomLeft, new MapCharItem('╞') },
+                        {HeaderCharMapPositions.BottomCenter, new MapCharItem('╤') },
+                        {HeaderCharMapPositions.BottomRight, new MapCharItem('╡') },
+                        {HeaderCharMapPositions.BorderTop, new MapCharItem('═') },
+                        {HeaderCharMapPositions.BorderRight, new MapCharItem('│') },
+                        {HeaderCharMapPositions.BorderBottom, new MapCharItem('═') },
+                        {HeaderCharMapPositions.BorderLeft, new MapCharItem('│') },
+                        {HeaderCharMapPositions.Divider, new MapCharItem(' ') },
                     })
                 .ExportAndWriteLine();
 
@@ -161,7 +164,9 @@ namespace ConsoleTableApp
             _____________________________PrintDemoDivider();
 
             Console.WriteLine("From [DataTable] type and Default format:");
-            ConsoleTableBuilder.From(SampleTableData()).ExportAndWriteLine();
+            ConsoleTableBuilder.From(SampleTableData()).WithTitle(new TableTitle("test")).ExportAndWriteLine();
+
+            _____________________________PrintDemoDivider();
 
             Console.WriteLine("From [DataTable] type and Minimal format:");
             ConsoleTableBuilder.From(SampleTableData()).WithFormat(ConsoleTableBuilderFormat.Minimal).ExportAndWriteLine();
@@ -215,19 +220,19 @@ namespace ConsoleTableApp
                 )
                 .WithMetadataRow(MetaRowPositions.Bottom, b => string.Format("=> Bottom line <{0}>", "HELLO WORLD"))
                 .WithColumn(new List<string> { "THIS", "IS", "ADVANCED", "OPTIONS" })
-                .WithCharMapDefinition(new Dictionary<CharMapPositions, char> {
-                    { CharMapPositions.BorderLeft, '¡' },
-                    { CharMapPositions.BorderRight, '¡' },
-                    { CharMapPositions.DividerY, '¡' }
+                .WithCharMapDefinition(new Dictionary<CharMapPositions, MapCharItem> {
+                    { CharMapPositions.BorderLeft, new MapCharItem('¡') },
+                    { CharMapPositions.BorderRight, new MapCharItem('¡') },
+                    { CharMapPositions.DividerY, new MapCharItem('¡') }
                 })
-                .WithHeaderCharMapDefinition(new Dictionary<HeaderCharMapPositions, char> {
-                    { HeaderCharMapPositions.BottomLeft, '»' },
-                    { HeaderCharMapPositions.BottomCenter, '»' },
-                    { HeaderCharMapPositions.BottomRight, '»' },
-                    { HeaderCharMapPositions.Divider, '¡' },
-                    { HeaderCharMapPositions.BorderBottom, '»' },
-                    { HeaderCharMapPositions.BorderLeft, '¡' },
-                    { HeaderCharMapPositions.BorderRight, '¡' }
+                .WithHeaderCharMapDefinition(new Dictionary<HeaderCharMapPositions, MapCharItem> {
+                    { HeaderCharMapPositions.BottomLeft, new MapCharItem('»') },
+                    { HeaderCharMapPositions.BottomCenter, new MapCharItem('»') },
+                    { HeaderCharMapPositions.BottomRight, new MapCharItem('»') },
+                    { HeaderCharMapPositions.Divider, new MapCharItem('¡') },
+                    { HeaderCharMapPositions.BorderBottom, new MapCharItem('»') },
+                    { HeaderCharMapPositions.BorderLeft, new MapCharItem('¡') },
+                    { HeaderCharMapPositions.BorderRight, new MapCharItem('¡') }
                 })
                 .ExportAndWriteLine();
 

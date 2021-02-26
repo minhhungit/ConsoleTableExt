@@ -2,9 +2,39 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 
 namespace ConsoleTableExt
 {
+    public class TableTitle
+    {
+        public string Value { get; private set; }
+        public string Start { get; private set; }
+        public string End { get; private set; }
+
+        public TableTitle()
+        {
+
+        }
+
+        public TableTitle(string value)
+        {
+            Value = value;
+        }
+
+        public TableTitle(string value, string start, string end)
+        {
+            Value = value;
+            Start = start;
+            End = end;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}{1}{2}", Start, Value, End);
+        }
+    }
+
     public class ConsoleTableBuilder
     {
         internal List<object> Column { get; set; }
@@ -14,25 +44,24 @@ namespace ConsoleTableExt
         internal List<List<object>> FormattedRows { get; set; }
 
         internal ConsoleTableBuilderFormat TableFormat { get; set; }
-        internal Dictionary<CharMapPositions, char> CharMapPositionStore { get; set; } = null;
-        internal Dictionary<HeaderCharMapPositions, char> HeaderCharMapPositionStore { get; set; } = null;
+        internal Dictionary<CharMapPositions, MapCharItem> CharMapPositionStore { get; set; } = null;
+        internal Dictionary<HeaderCharMapPositions, MapCharItem> HeaderCharMapPositionStore { get; set; } = null;
         internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> TopMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
         internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
         internal Dictionary<int, TextAligntment> TextAligmentData = new Dictionary<int, TextAligntment>();
         internal Dictionary<int, int> MinLengthData = new Dictionary<int, int>();
 
         internal bool CanTrimColumn = false;
-        internal string TableTitle = string.Empty;
+        internal TableTitle TableTitle = new TableTitle();
         internal TextAligntment TableTitleTextAlignment = TextAligntment.Center;
-        internal ConsoleColorNullable TableTitleColor = new ConsoleColorNullable();
+
         internal string PaddingLeft = " ";
         internal string PaddingRight = " ";
 
-        internal int TitlePositionStartAt { get; set; }
-        internal int TitlePositionLength { get; set; }
-
         internal Dictionary<int, Func<string, string>> FormatterStore = new Dictionary<int, Func<string, string>>();
         internal Dictionary<int, Func<string, string>> ColumnFormatterStore = new Dictionary<int, Func<string, string>>();
+
+        public List<int> ColumnLengths { get; set; }
 
         private ConsoleTableBuilder()
         {
@@ -203,7 +232,7 @@ namespace ConsoleTableExt
             }
         }
 
-        internal void CenterRowContent(List<int> columnLengths)
+        internal void CenterRowContent()
         {
             for (int i = 0; i < FormattedRows.Count; i++)
             {
@@ -211,19 +240,19 @@ namespace ConsoleTableExt
                 {
                     if (TextAligmentData.ContainsKey(j) && TextAligmentData[j] == TextAligntment.Center)
                     {
-                        FormattedRows[i][j] = CenteredString(FormattedRows[i][j], columnLengths[j]);
+                        FormattedRows[i][j] = CenteredString(FormattedRows[i][j], ColumnLengths[j]);
                     }                    
                 }
             }
         }
 
-        internal string[] CenterColumnContent(string[] columnSlices, List<int> columnLengths)
+        internal string[] CenterColumnContent(string[] columnSlices)
         {
             for (int i = 0; i < columnSlices.Length; i++)
             {
                 if (TextAligmentData.ContainsKey(i) && TextAligmentData[i] == TextAligntment.Center)
                 {
-                    columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
+                    columnSlices[i] = CenteredString(columnSlices[i], ColumnLengths[i]);
                 }
             }
 
@@ -248,7 +277,7 @@ namespace ConsoleTableExt
             return new string(' ', leftPadding) + s + new string(' ', rightPadding);
         }
 
-        internal List<int> GetCadidateColumnLengths()
+        internal void BuildCadidateColumnLengths()
         {
             var columnLengths = new List<int>();
 
@@ -267,7 +296,7 @@ namespace ConsoleTableExt
 
             if (numberOfColumns == 0)
             {
-                return new List<int>();
+                ColumnLengths = new List<int>();
             }
 
             if (numberOfColumns < FormattedColumns.Count)
@@ -338,10 +367,10 @@ namespace ConsoleTableExt
                 }
             }
 
-            return columnLengths;
+            this.ColumnLengths = columnLengths;
         }
 
-        public int NumberOfColumns { get { return this.GetCadidateColumnLengths().Count; } }
+        public int NumberOfColumns { get { return ColumnLengths.Count; } }
         public int NumberOfRows { get { return this.Rows.Count; } }
 
         //internal string Format(char delimiter)
@@ -365,71 +394,99 @@ namespace ConsoleTableExt
         //    }
         //}
 
-        private string EmbedTitle(string line)
+        private string RepeatString(string input, int count)
         {
-            var originalTitleLength = TableTitle.Length;
-
-            if (!string.IsNullOrEmpty(TableTitle) && TableTitle.Trim().Length > 0) // !IsNullOrWhiteSpace
+            if (!string.IsNullOrEmpty(input))
             {
-                if (TableTitle.Length > line.Length - 4)
-                {
-                    TableTitle = TableTitle.Substring(0, line.Length - 4);
+                StringBuilder builder = new StringBuilder(input.Length * count);
 
-                    if (originalTitleLength != TableTitle.Length && TableTitle.Length > 3)
-                    {
-                        TableTitle = TableTitle.Substring(0, TableTitle.Length - 3) + "...";
-                    }
-                }
+                for (int i = 0; i < count; i++) builder.Append(input);
 
-                TableTitle = TableTitle.Trim();
-                TableTitle = " " + TableTitle + " ";
-
-                var startPoint = 0;
-                switch (TableTitleTextAlignment)
-                {
-                    case TextAligntment.Left:
-                        startPoint = 1;                        
-                        break;
-                    case TextAligntment.Right:
-                        startPoint = line.Length - 1 - TableTitle.Length;
-                        break;
-                    case TextAligntment.Center:
-                        startPoint = (line.Length - TableTitle.Length) / 2;
-                        break;
-                    default:
-                        break;
-                }
-
-                TitlePositionStartAt = startPoint;
-                var newBeginTableFormat = line.Substring(0, startPoint);
-                newBeginTableFormat += TableTitle;
-                TitlePositionLength = TableTitle.Length;
-                newBeginTableFormat += line.Substring(newBeginTableFormat.Length, line.Length - newBeginTableFormat.Length);
-
-                line = newBeginTableFormat;
-                line = line.Replace("\0", " ");
+                return builder.ToString();
             }
 
+            return string.Empty;
+        }
+
+        private string EmbedTitle(string line)
+        {
             return line;
+            //var originalTitleLength = TableTitle.Length;
+
+            //if (!string.IsNullOrEmpty(TableTitle) && TableTitle.Trim().Length > 0) // !IsNullOrWhiteSpace
+            //{
+            //    if (TableTitle.Length > line.Length - 4)
+            //    {
+            //        TableTitle = TableTitle.Substring(0, line.Length - 4);
+
+            //        if (originalTitleLength != TableTitle.Length && TableTitle.Length > 3)
+            //        {
+            //            TableTitle = TableTitle.Substring(0, TableTitle.Length - 3) + "...";
+            //        }
+            //    }
+
+            //    TableTitle = TableTitle.Trim();
+            //    TableTitle = " " + TableTitle + " ";
+
+            //    var startPoint = 0;
+            //    switch (TableTitleTextAlignment)
+            //    {
+            //        case TextAligntment.Left:
+            //            startPoint = 1;
+            //            break;
+            //        case TextAligntment.Right:
+            //            startPoint = line.Length - 1 - TableTitle.Length;
+            //            break;
+            //        case TextAligntment.Center:
+            //            startPoint = (line.Length - TableTitle.Length) / 2;
+            //            break;
+            //        default:
+            //            break;
+            //    }
+
+            //    TitlePositionStartAt = startPoint;
+            //    var newBeginTableFormat = line.Substring(0, startPoint);
+            //    newBeginTableFormat += TableTitle;
+            //    TitlePositionLength = TableTitle.Length;
+            //    newBeginTableFormat += line.Substring(newBeginTableFormat.Length, line.Length - newBeginTableFormat.Length);
+
+            //    line = newBeginTableFormat;
+            //    line = line.Replace("\0", " ");
+            //}
+
+            //return line;
         }
         #region Table lines
 
-        internal string CreateTableTopLine(List<int> columnLengths, Dictionary<CharMapPositions, char> definition)
+        internal string CreateTableTopLine(Dictionary<CharMapPositions, MapCharItem> definition)
         {
             var borderTop = definition[CharMapPositions.BorderTop];
             var topLeft = definition[CharMapPositions.TopLeft];
             var topCenter = definition[CharMapPositions.TopCenter];
             var topRight = definition[CharMapPositions.TopRight];
 
-            if (columnLengths.Count > 0)
+
+            if (ColumnLengths.Count > 0)
             {
-                var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => new string(borderTop, columnLengths[i] + (PaddingLeft + PaddingRight).Length))
+                string line = string.Empty;
+                
+                if (TableTitle != null && TableTitle.ToString().Length > 0)
+                {
+                    // @TODO IMPLEMENT TITLE
+                    var result = Enumerable.Range(0, ColumnLengths.Count)
+                           .Select(i => RepeatString(borderTop.ToString(), ColumnLengths[i] + (PaddingLeft + PaddingRight).Length))
+                           .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : topCenter.ToString()) + a);
+
+                    line = (CanRemoveBorderLeft() ? string.Empty : topLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : topRight.ToString());
+                }
+                else
+                {
+                    var result = Enumerable.Range(0, ColumnLengths.Count)
+                            .Select(i => RepeatString(borderTop.ToString(), ColumnLengths[i] + (PaddingLeft + PaddingRight).Length))
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : topCenter.ToString()) + a);
 
-                var line = (CanRemoveBorderLeft() ? string.Empty : topLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : topRight.ToString());
-
-                line = EmbedTitle(line);
+                    line = (CanRemoveBorderLeft() ? string.Empty : topLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : topRight.ToString());
+                }
 
                 if (line.Trim('\0').Length == 0)
                 {
@@ -444,15 +501,15 @@ namespace ConsoleTableExt
             }
         }
 
-        internal string CreateTableContentLineFormat(List<int> columnLengths, Dictionary<CharMapPositions, char> definition)
+        internal string CreateTableContentLineFormat(Dictionary<CharMapPositions, MapCharItem> definition)
         {
             var borderLeft = definition[CharMapPositions.BorderLeft];
             var divider = definition[CharMapPositions.DividerY];
             var borderRight = definition[CharMapPositions.BorderRight];
 
-            if (columnLengths.Count > 0)
+            if (ColumnLengths.Count > 0)
             {
-                var result = Enumerable.Range(0, columnLengths.Count)
+                var result = Enumerable.Range(0, ColumnLengths.Count)
                             .Select(i =>
                             {
                                 var alignmentChar = string.Empty;
@@ -460,7 +517,7 @@ namespace ConsoleTableExt
                                 {
                                     alignmentChar = "-";
                                 }
-                                return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
+                                return PaddingLeft + "{" + i + "," + alignmentChar + ColumnLengths[i] + "}" + PaddingRight;
                             })
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : divider.ToString()) + a);
 
@@ -474,17 +531,17 @@ namespace ConsoleTableExt
             }
         }
 
-        internal string CreateTableMiddleLine(List<int> columnLengths, Dictionary<CharMapPositions, char> definition)
+        internal string CreateTableMiddleLine(Dictionary<CharMapPositions, MapCharItem> definition)
         {
             var dividerX = definition[CharMapPositions.DividerX];
             var middleLeft = definition[CharMapPositions.MiddleLeft];
             var middleCenter = definition[CharMapPositions.MiddleCenter];
             var middleRight = definition[CharMapPositions.MiddleRight];
 
-            if (columnLengths.Count > 0)
+            if (ColumnLengths.Count > 0)
             {
-                var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => new string(dividerX, columnLengths[i] + (PaddingLeft + PaddingRight).Length))
+                var result = Enumerable.Range(0, ColumnLengths.Count)
+                            .Select(i => RepeatString(dividerX.ToString(), ColumnLengths[i] + (PaddingLeft + PaddingRight).Length))
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : middleCenter.ToString()) + a);
 
                 var line = (CanRemoveBorderLeft() ? string.Empty : middleLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : middleRight.ToString());
@@ -503,17 +560,17 @@ namespace ConsoleTableExt
         }
 
 
-        internal string CreateTableBottomLine(List<int> columnLengths, Dictionary<CharMapPositions, char> definition)
+        internal string CreateTableBottomLine(Dictionary<CharMapPositions, MapCharItem> definition)
         {
             var borderBottom = definition[CharMapPositions.BorderBottom];
             var bottomLeft = definition[CharMapPositions.BottomLeft];
             var bottomCenter = definition[CharMapPositions.BottomCenter];
             var bottomRight = definition[CharMapPositions.BottomRight];
 
-            if (columnLengths.Count > 0)
+            if (ColumnLengths.Count > 0)
             {
-                var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => new string(borderBottom, columnLengths[i] + (PaddingLeft + PaddingRight).Length))
+                var result = Enumerable.Range(0, ColumnLengths.Count)
+                            .Select(i => RepeatString(borderBottom.ToString(), ColumnLengths[i] + (PaddingLeft + PaddingRight).Length))
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : bottomCenter.ToString()) + a);
 
                 var line = (CanRemoveBorderLeft() ? string.Empty : bottomLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : bottomRight.ToString());
@@ -536,17 +593,17 @@ namespace ConsoleTableExt
 
         #region Header lines
 
-        internal string CreateHeaderTopLine(List<int> columnLengths, Dictionary<CharMapPositions, char> definition, Dictionary<HeaderCharMapPositions, char> headerDefinition)
+        internal string CreateHeaderTopLine(Dictionary<CharMapPositions, MapCharItem> definition, Dictionary<HeaderCharMapPositions, MapCharItem> headerDefinition)
         {
             var borderTop = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.BorderTop) ? headerDefinition[HeaderCharMapPositions.BorderTop] : definition[CharMapPositions.BorderTop];
             var topLeft = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.TopLeft) ? headerDefinition[HeaderCharMapPositions.TopLeft] : definition[CharMapPositions.TopLeft];
             var topCenter = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.TopCenter) ? headerDefinition[HeaderCharMapPositions.TopCenter] : definition[CharMapPositions.TopCenter];
             var topRight = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.TopRight) ? headerDefinition[HeaderCharMapPositions.TopRight] : definition[CharMapPositions.TopRight];
 
-            if (columnLengths.Count > 0)
+            if (ColumnLengths.Count > 0)
             {
-                var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => new string(borderTop, columnLengths[i] + (PaddingLeft + PaddingRight).Length))
+                var result = Enumerable.Range(0, ColumnLengths.Count)
+                            .Select(i => RepeatString(borderTop.ToString(), ColumnLengths[i] + (PaddingLeft + PaddingRight).Length))
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : topCenter.ToString()) + a);
 
                 var line = (CanRemoveBorderLeft() ? string.Empty : topLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : topRight.ToString());
@@ -566,15 +623,15 @@ namespace ConsoleTableExt
             }
         }
 
-        internal string CreateHeaderContentLineFormat(List<int> columnLengths, Dictionary<CharMapPositions, char> definition, Dictionary<HeaderCharMapPositions, char> headerDefinition)
+        internal string CreateHeaderContentLineFormat(Dictionary<CharMapPositions, MapCharItem> definition, Dictionary<HeaderCharMapPositions, MapCharItem> headerDefinition)
         {
             var borderLeft = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.BorderLeft) ? headerDefinition[HeaderCharMapPositions.BorderLeft] : definition[CharMapPositions.BorderLeft];
             var divider = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.Divider) ? headerDefinition[HeaderCharMapPositions.Divider] : definition[CharMapPositions.DividerY];
             var borderRight = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.BorderRight) ? headerDefinition[HeaderCharMapPositions.BorderRight] : definition[CharMapPositions.BorderRight];
 
-            if (columnLengths.Count > 0)
+            if (ColumnLengths.Count > 0)
             {
-                var result = Enumerable.Range(0, columnLengths.Count)
+                var result = Enumerable.Range(0, ColumnLengths.Count)
                             .Select(i => {
                                 var alignmentChar = string.Empty;
                                 if (TextAligmentData == null || !TextAligmentData.ContainsKey(i) || TextAligmentData[i] == TextAligntment.Left)
@@ -582,7 +639,7 @@ namespace ConsoleTableExt
                                     alignmentChar = "-";
                                 }
 
-                                return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
+                                return PaddingLeft + "{" + i + "," + alignmentChar + ColumnLengths[i] + "}" + PaddingRight;
                             })
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : divider.ToString()) + a);
 
@@ -596,17 +653,17 @@ namespace ConsoleTableExt
             }
         }
 
-        internal string CreateHeaderBottomLine(List<int> columnLengths, Dictionary<CharMapPositions, char> definition, Dictionary<HeaderCharMapPositions, char> headerDefinition)
+        internal string CreateHeaderBottomLine(Dictionary<CharMapPositions, MapCharItem> definition, Dictionary<HeaderCharMapPositions, MapCharItem> headerDefinition)
         {
             var borderBottom = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.BorderBottom) ? headerDefinition[HeaderCharMapPositions.BorderBottom] : definition[CharMapPositions.DividerX];
             var bottomLeft = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.BottomLeft) ? headerDefinition[HeaderCharMapPositions.BottomLeft] : definition[CharMapPositions.MiddleLeft];
             var bottomCenter = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.BottomCenter) ? headerDefinition[HeaderCharMapPositions.BottomCenter] : definition[CharMapPositions.MiddleRight];
             var bottomRight = headerDefinition != null && headerDefinition.ContainsKey(HeaderCharMapPositions.BottomRight) ? headerDefinition[HeaderCharMapPositions.BottomRight] : definition[CharMapPositions.MiddleCenter];
 
-            if (columnLengths.Count > 0)
+            if (ColumnLengths.Count > 0)
             {
-                var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => new string(borderBottom, columnLengths[i] + (PaddingLeft + PaddingRight).Length))
+                var result = Enumerable.Range(0, ColumnLengths.Count)
+                            .Select(i => RepeatString(borderBottom.ToString(), ColumnLengths[i] + (PaddingLeft + PaddingRight).Length))
                             .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : bottomCenter.ToString()) + a);
 
                 var line = (CanRemoveBorderLeft() ? string.Empty : bottomLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : bottomRight.ToString());
@@ -630,7 +687,7 @@ namespace ConsoleTableExt
         {
             if (HeaderCharMapPositionStore == null)
             {
-                return new List<char> {
+                return new List<MapCharItem> {
                     CharMapPositionStore[CharMapPositions.TopLeft],
                     CharMapPositionStore[CharMapPositions.MiddleLeft],
                     CharMapPositionStore[CharMapPositions.BottomLeft],
@@ -643,7 +700,7 @@ namespace ConsoleTableExt
             }
             else
             {
-                var data = new List<char> { };
+                var data = new List<MapCharItem> { };
                 data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.TopLeft) ? 
                     HeaderCharMapPositionStore[HeaderCharMapPositions.TopLeft] : CharMapPositionStore[CharMapPositions.TopLeft]);
 
@@ -670,7 +727,7 @@ namespace ConsoleTableExt
         {
             if (HeaderCharMapPositionStore == null)
             {
-                return new List<char> {
+                return new List<MapCharItem> {
                     CharMapPositionStore[CharMapPositions.TopRight],
                     CharMapPositionStore[CharMapPositions.MiddleRight],
                     CharMapPositionStore[CharMapPositions.BottomRight],
@@ -683,7 +740,7 @@ namespace ConsoleTableExt
             }
             else
             {
-                var data = new List<char> { };
+                var data = new List<MapCharItem> { };
                 data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.TopRight) ?
                     HeaderCharMapPositionStore[HeaderCharMapPositions.TopRight] : CharMapPositionStore[CharMapPositions.TopRight]);
 
@@ -710,7 +767,7 @@ namespace ConsoleTableExt
         {
             if (HeaderCharMapPositionStore == null)
             {
-                return new List<char> {
+                return new List<MapCharItem> {
                     CharMapPositionStore[CharMapPositions.TopCenter],
                     CharMapPositionStore[CharMapPositions.MiddleCenter],
                     CharMapPositionStore[CharMapPositions.BottomCenter],
@@ -723,7 +780,7 @@ namespace ConsoleTableExt
             }
             else
             {
-                var data = new List<char> { };
+                var data = new List<MapCharItem> { };
                 data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.TopCenter) ?
                     HeaderCharMapPositionStore[HeaderCharMapPositions.TopCenter] : CharMapPositionStore[CharMapPositions.TopCenter]);
 

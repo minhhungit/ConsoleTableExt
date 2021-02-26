@@ -23,3 +23,5 @@ static void Main(string[] args)
 
 // https://www.jerriepelser.com/blog/using-ansi-color-codes-in-net-console-apps/
 // https://en.wikipedia.org/wiki/ANSI_escape_code
+// https://stackoverflow.com/a/46252884/3007147
+var s = new Regex(@"\x1B\[[^@-~]*[@-~]").Replace(text, "");

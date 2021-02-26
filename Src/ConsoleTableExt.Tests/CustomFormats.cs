@@ -15,7 +15,7 @@ namespace ConsoleTableExt.Tests
             var strBuilder =
                 ConsoleTableBuilder
                 .From(SampleData.SampleTableData)
-                .WithTitle("TITLE")
+                .WithTitle(new TableTitle("TITLE"))
                 .WithPaddingLeft(String.Empty)
                 .WithCharMapDefinition()
                 .Export();
