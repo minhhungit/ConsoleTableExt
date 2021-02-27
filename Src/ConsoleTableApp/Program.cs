@@ -11,6 +11,23 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
+            ConsoleTableBuilder
+               .From(SampleTableData())
+               .WithFormat(ConsoleTableBuilderFormat.Alternative)
+               .WithColumnFormatter(1, (text) => $"[ {text.ToUpper()} ]")
+               .WithFormatter(1, (text) => $"<{text}>")
+               .WithMinLength(new Dictionary<int, int> {
+                    { 1, 30 }
+               })
+               .WithTextAlignment(new Dictionary<int, TextAligntment>{
+                    { 1, TextAligntment.Right }
+               })
+               .WithHeaderTextAlignment(new Dictionary<int, TextAligntment> {
+                   {1, TextAligntment.Center }
+               })
+               .WithTitle("MY TABLE", ConsoleColor.DarkRed, ConsoleColor.Gray, TextAligntment.Right)
+               .ExportAndWriteLine(TableAligntment.Center);
+
             ConsoleTableBuilder.From(new List<object[]>
             {
                 new object[] { "s" }

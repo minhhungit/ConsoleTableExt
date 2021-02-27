@@ -1,3 +1,7 @@
+## 3.1.5 (2021-02-28)
+- introduce WithHeaderTextAlignment, allow user custom header alignment, if it's not defined, it will get text alignment setting, default is left
+- fix bug: double header formatter
+
 ## 3.1.4 (2021-02-22)
 - support text alignment center
 - change order of items in enum TableAligntment

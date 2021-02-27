@@ -186,6 +186,16 @@ namespace ConsoleTableExt
             return builder;
         }
 
+        public static ConsoleTableBuilder WithHeaderTextAlignment(this ConsoleTableBuilder builder, Dictionary<int, TextAligntment> alignmentData)
+        {
+            if (alignmentData != null)
+            {
+                builder.HeaderTextAligmentData = alignmentData;
+            }
+
+            return builder;
+        }
+
         public static ConsoleTableBuilder WithMinLength(this ConsoleTableBuilder builder, Dictionary<int, int> minLengthData)
         {
             if (minLengthData != null)
@@ -532,9 +542,10 @@ namespace ConsoleTableExt
                 }
 
                 var headerSlices = builder.FormattedColumns.ToArray();
-                var formattedHeaderSlice = Enumerable.Range(0, headerSlices.Length).Select(idx => builder.ColumnFormatterStore.ContainsKey(idx) ? builder.ColumnFormatterStore[idx](headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()) : headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()).ToArray();
+                var formattedHeaderSlice = builder.CenterColumnContent(headerSlices, columnLengths);
 
-                formattedHeaderSlice = builder.CenterColumnContent(formattedHeaderSlice, columnLengths);
+                //var formattedHeaderSlice = Enumerable.Range(0, headerSlices.Length).Select(idx => builder.ColumnFormatterStore.ContainsKey(idx) ? builder.ColumnFormatterStore[idx](headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()) : headerSlices[idx] == null ? string.Empty : headerSlices[idx].ToString()).ToArray();
+                //formattedHeaderSlice = builder.CenterColumnContent(headerSlices, columnLengths);
 
                 if (headerRowContentFormat != null && headerRowContentFormat.Trim().Length > 0)
                 {

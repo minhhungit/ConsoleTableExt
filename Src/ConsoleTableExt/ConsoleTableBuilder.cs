@@ -19,6 +19,7 @@ namespace ConsoleTableExt
         internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> TopMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
         internal List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>> BottomMetadataRows = new List<KeyValuePair<MetaRowPositions, Func<ConsoleTableBuilder, string>>>();
         internal Dictionary<int, TextAligntment> TextAligmentData = new Dictionary<int, TextAligntment>();
+        internal Dictionary<int, TextAligntment> HeaderTextAligmentData = new Dictionary<int, TextAligntment>();
         internal Dictionary<int, int> MinLengthData = new Dictionary<int, int>();
 
         internal bool CanTrimColumn = false;
@@ -221,10 +222,20 @@ namespace ConsoleTableExt
         {
             for (int i = 0; i < columnSlices.Length; i++)
             {
-                if (TextAligmentData.ContainsKey(i) && TextAligmentData[i] == TextAligntment.Center)
+                if (HeaderTextAligmentData.ContainsKey(i))
                 {
-                    columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
+                    if (HeaderTextAligmentData[i] == TextAligntment.Center)
+                    {
+                        columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
+                    }                    
                 }
+                else
+                {
+                    if (TextAligmentData.ContainsKey(i) && TextAligmentData[i] == TextAligntment.Center)
+                    {
+                        columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
+                    }
+                }                
             }
 
             return columnSlices;
@@ -577,10 +588,21 @@ namespace ConsoleTableExt
                 var result = Enumerable.Range(0, columnLengths.Count)
                             .Select(i => {
                                 var alignmentChar = string.Empty;
-                                if (TextAligmentData == null || !TextAligmentData.ContainsKey(i) || TextAligmentData[i] == TextAligntment.Left)
+
+                                if (HeaderTextAligmentData.ContainsKey(i))
                                 {
-                                    alignmentChar = "-";
+                                    if (HeaderTextAligmentData[i] == TextAligntment.Left)
+                                    {
+                                        alignmentChar = "-";
+                                    }
                                 }
+                                else
+                                {
+                                    if (TextAligmentData == null || !TextAligmentData.ContainsKey(i) || TextAligmentData[i] == TextAligntment.Left)
+                                    {
+                                        alignmentChar = "-";
+                                    }
+                                }                                
 
                                 return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
                             })
