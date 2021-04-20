@@ -1,5 +1,4 @@
-﻿
-namespace ConsoleTableExt
+﻿namespace ConsoleTableExtNet5.Enums
 {
     /// <summary>
     /// Check map here https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/HeaderCharMapPositions.png
@@ -15,7 +14,7 @@ namespace ConsoleTableExt
         BorderTop,
         BorderRight,
         BorderBottom,
-        BorderLeft,        
+        BorderLeft,
         Divider,
     }
 }

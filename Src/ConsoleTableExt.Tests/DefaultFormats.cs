@@ -1,12 +1,10 @@
-﻿using NUnit.Framework;
-using System;
-using System.ComponentModel;
-using System.Linq;
+﻿using ConsoleTableExtNet5.Enums;
+using NUnit.Framework;
 
-namespace ConsoleTableExt.Tests
+namespace ConsoleTableExtNet5.Tests
 {
     [TestFixture]
-    public  class DefaultFormats
+    public class DefaultFormats
     {
         [Test]
         public void DefaultFormatWithDataTable()

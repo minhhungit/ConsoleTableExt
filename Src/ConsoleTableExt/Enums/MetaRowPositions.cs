@@ -1,6 +1,5 @@
-﻿
-namespace ConsoleTableExt
-{    
+﻿namespace ConsoleTableExtNet5.Enums
+{
     public enum MetaRowPositions
     {
         Top = 0,

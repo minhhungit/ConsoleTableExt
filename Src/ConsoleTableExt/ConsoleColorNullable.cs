@@ -1,6 +1,5 @@
 ﻿using System;
-
-namespace ConsoleTableExt
+namespace ConsoleTableExtNet5
 {
     public class ConsoleColorNullable
     {

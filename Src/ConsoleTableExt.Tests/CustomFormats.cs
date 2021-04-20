@@ -1,13 +1,10 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 
-namespace ConsoleTableExt.Tests
+namespace ConsoleTableExtNet5.Tests
 {
     [TestFixture]
-    public  class CustomFormats
+    public class CustomFormats
     {
         [Test]
         public void DefaultFormatWithDataTable()
@@ -30,6 +27,6 @@ Bradley Greer  Software Engineer             San Francisco 28  11/15/2017 12:00:
             var lines = strBuilder.ToString().Split('\n');
             Assert.IsTrue(lines.Length == 7);
         }
-        
+
     }
 }

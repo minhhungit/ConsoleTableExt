@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using ConsoleTableExtNet5.Enums;
 
-namespace ConsoleTableExt
+namespace ConsoleTableExtNet5
 {
     public class ConsoleTableBaseData
     {
@@ -93,7 +94,7 @@ namespace ConsoleTableExt
             {
                 builder.Rows.Add(new List<object> { value });
             }
-            
+
             return builder;
         }
 
@@ -221,7 +222,7 @@ namespace ConsoleTableExt
             if (rows == null)
             {
                 return builder;
-            }            
+            }
 
             foreach (var row in rows)
             {
@@ -291,7 +292,7 @@ namespace ConsoleTableExt
                     if (TextAligmentData.ContainsKey(j) && TextAligmentData[j] == TextAligntment.Center)
                     {
                         FormattedRows[i][j] = CenteredString(FormattedRows[i][j], columnLengths[j]);
-                    }                    
+                    }
                 }
             }
         }
@@ -305,7 +306,7 @@ namespace ConsoleTableExt
                     if (HeaderTextAligmentData[i] == TextAligntment.Center)
                     {
                         columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
-                    }                    
+                    }
                 }
                 else
                 {
@@ -313,7 +314,7 @@ namespace ConsoleTableExt
                     {
                         columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
                     }
-                }                
+                }
             }
 
             return columnSlices;
@@ -351,7 +352,7 @@ namespace ConsoleTableExt
                 if (FormattedColumns != null)
                 {
                     numberOfColumns = FormattedColumns.Count;
-                }                
+                }
             }
 
             if (numberOfColumns == 0)
@@ -477,7 +478,7 @@ namespace ConsoleTableExt
                 switch (TableTitleTextAlignment)
                 {
                     case TextAligntment.Left:
-                        startPoint = 1;                        
+                        startPoint = 1;
                         break;
                     case TextAligntment.Right:
                         startPoint = line.Length - 1 - TableTitle.Length;
@@ -680,7 +681,7 @@ namespace ConsoleTableExt
                                     {
                                         alignmentChar = "-";
                                     }
-                                }                                
+                                }
 
                                 return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
                             })
@@ -744,7 +745,7 @@ namespace ConsoleTableExt
             else
             {
                 var data = new List<char> { };
-                data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.TopLeft) ? 
+                data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.TopLeft) ?
                     HeaderCharMapPositionStore[HeaderCharMapPositions.TopLeft] : CharMapPositionStore[CharMapPositions.TopLeft]);
 
                 data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.BorderLeft) ?
@@ -757,7 +758,7 @@ namespace ConsoleTableExt
                 data.Add(CharMapPositionStore[CharMapPositions.BorderLeft]);
                 data.Add(CharMapPositionStore[CharMapPositions.BottomLeft]);
 
-                return 
+                return
                     data
                         .Select(x => x.ToString())
                         .Aggregate((s, a) => s + a)
