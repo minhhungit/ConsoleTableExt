@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net45;net35</TargetFrameworks>
         <Title>ConsoleTableExt</Title>
-        <Version>3.1.5</Version>
+        <Version>3.1.6</Version>
         <Copyright>Copyright 2017 minhhungit</Copyright>
         <Description>A fluent library to print out a nicely formatted table in a console application C#</Description>
         <Authors>Hung Vo</Authors>
@@ -10,9 +10,9 @@
         <PackageProjectUrl>https://github.com/minhhungit/ConsoleTableExt/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/minhhungit/ConsoleTableExt/</RepositoryUrl>
         <PackageTags>console text-table fluent console-table</PackageTags>
-        <PackageReleaseNotes>add WithHeaderTextAlignment, fix double header formatter bug</PackageReleaseNotes>
-        <AssemblyVersion>3.1.5</AssemblyVersion>
-        <FileVersion>3.1.5</FileVersion>
+        <PackageReleaseNotes>fix bug: list crashed when using with string type</PackageReleaseNotes>
+        <AssemblyVersion>3.1.6</AssemblyVersion>
+        <FileVersion>3.1.6</FileVersion>
         <Company />
         <PackageIconUrl>https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/icon.ico</PackageIconUrl>
     </PropertyGroup>
