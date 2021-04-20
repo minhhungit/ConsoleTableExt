@@ -42,6 +42,40 @@ namespace ConsoleTableExt
             TableFormat = ConsoleTableBuilderFormat.Default;
         }
 
+        public static ConsoleTableBuilder From(List<int> list)
+        {
+            var builder = new ConsoleTableBuilder();
+            foreach (var value in list)
+            {
+                builder.Rows.Add(new List<object> { value });
+            }
+            
+            return builder;
+        }
+
+        public static ConsoleTableBuilder From(List<string> list)
+        {
+            var builder = new ConsoleTableBuilder();
+            foreach (var value in list)
+            {
+                builder.Rows.Add(new List<object> { value });
+            }
+
+            return builder;
+        }
+
+        public static ConsoleTableBuilder From(List<object> list)
+        {
+            var builder = new ConsoleTableBuilder();
+
+            foreach (var value in list)
+            {
+                builder.Rows.Add(new List<object> { value });
+            }
+
+            return builder;
+        }
+
         public static ConsoleTableBuilder From(DataTable dt)
         {
             var builder = new ConsoleTableBuilder();
@@ -68,7 +102,7 @@ namespace ConsoleTableExt
             return builder;
         }
 
-        public static ConsoleTableBuilder From<T>(List<T> list)
+        public static ConsoleTableBuilder From<T>(List<T> list) where T : class
         {
             var builder = new ConsoleTableBuilder();
             if (list == null)
@@ -118,7 +152,7 @@ namespace ConsoleTableExt
                     foreach (var prop in props)
                     {
 #if NET35
-                        var objValue = prop.GetValue(item, new object[]{ });
+                                    var objValue = prop.GetValue(item, new object[]{ });
 #else
                         var objValue = prop.GetValue(item);
 #endif

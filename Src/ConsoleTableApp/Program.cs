@@ -11,6 +11,15 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
+            ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 })
+               .WithFormat(ConsoleTableBuilderFormat.Alternative)
+               .ExportAndWriteLine();
+
+            ConsoleTableBuilder.From(new List<string> { "1", "2", "3", "4", "5", "6" })
+               .WithFormat(ConsoleTableBuilderFormat.Alternative)
+               .WithColumn("I'm a custom name")
+               .ExportAndWriteLine();
+
             ConsoleTableBuilder
                .From(SampleTableData())
                .WithFormat(ConsoleTableBuilderFormat.Alternative)
