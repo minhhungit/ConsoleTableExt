@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 
-namespace ConsoleTableExt.Tests
+namespace ConsoleTableExtNet5.Tests
 {
     public class SampleData
     {
@@ -24,7 +24,7 @@ namespace ConsoleTableExt.Tests
                 table.Rows.Add("Bradley Greer", "Software Engineer", "San Francisco", 28, new DateTime(2017, 11, 15));
 
                 return table;
-            }  
+            }
         }
 
         public static List<List<object>> SampleShortListData = new List<List<object>>

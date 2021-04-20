@@ -1,4 +1,4 @@
-namespace ConsoleTableExt
+﻿namespace ConsoleTableExtNet5.Enums
 {
     public enum ConsoleTableBuilderFormat
     {

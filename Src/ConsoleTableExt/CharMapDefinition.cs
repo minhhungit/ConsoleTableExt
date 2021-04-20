@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using ConsoleTableExtNet5.Enums;
 
-namespace ConsoleTableExt
+namespace ConsoleTableExtNet5
 {
     public class CharMapDefinition
     {

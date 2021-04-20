@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using ConsoleTableExtNet5.Enums;
 
-namespace ConsoleTableExt
+namespace ConsoleTableExtNet5
 {
     public static class ConsoleTableBuilderExtensions
     {
@@ -311,7 +312,7 @@ namespace ConsoleTableExt
 
                     builder.HeaderCharMapPositionStore = new Dictionary<HeaderCharMapPositions, char>
                     {
-                        { HeaderCharMapPositions.BorderBottom, '-' }                        
+                        { HeaderCharMapPositions.BorderBottom, '-' }
                     };
 
                     builder.PaddingLeft = string.Empty;
@@ -360,7 +361,7 @@ namespace ConsoleTableExt
                 if (builder.Column != null)
                 {
                     numberOfColumns = builder.Column.Count();
-                }                
+                }
             }
 
             if (numberOfColumns == 0)
@@ -416,7 +417,7 @@ namespace ConsoleTableExt
             for (int i = 0; i < linesCount; i++)
             {
                 var row = string.Empty;
-                
+
                 switch (alignment)
                 {
                     case TableAligntment.Left:
@@ -430,14 +431,14 @@ namespace ConsoleTableExt
                         break;
                 }
 
-                if (i == 0 
-                    && !string.IsNullOrEmpty(builder.TableTitle) 
-                    && builder.TableTitle.Trim().Length != 0 
+                if (i == 0
+                    && !string.IsNullOrEmpty(builder.TableTitle)
+                    && builder.TableTitle.Trim().Length != 0
                     && !builder.TableTitleColor.IsForegroundColorNull
                     && builder.TitlePositionStartAt > 0
                     && builder.TitlePositionLength > 0)
                 {
-                    var newTitlePositionStartAt = builder.TitlePositionStartAt + (row.Length - lines[i].Length); 
+                    var newTitlePositionStartAt = builder.TitlePositionStartAt + (row.Length - lines[i].Length);
 
                     Console.Write(row.Substring(0, newTitlePositionStartAt));
                     Console.ForegroundColor = builder.TableTitleColor.ForegroundColor;
@@ -473,7 +474,7 @@ namespace ConsoleTableExt
                         {
                             Console.WriteLine(row);
                         }
-                    }                    
+                    }
                 }
             }
         }
@@ -483,7 +484,7 @@ namespace ConsoleTableExt
             builder.ExportAndWrite(alignment);
             Console.Write('\n');
         }
-                
+
         private static StringBuilder CreateTableForCustomFormat(ConsoleTableBuilder builder)
         {
             if (builder.CharMapPositionStore == null)
@@ -503,7 +504,7 @@ namespace ConsoleTableExt
             for (int i = 0; i < topMetadataStringBuilder.Count; i++)
             {
                 strBuilder.AppendLine(topMetadataStringBuilder[i]);
-            }            
+            }
 
             var tableTopLine = builder.CreateTableTopLine(columnLengths, filledMap);
             var tableRowContentFormat = builder.CreateTableContentLineFormat(columnLengths, filledMap);
@@ -524,8 +525,8 @@ namespace ConsoleTableExt
             // find the longest formatted line
             //var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(tableRowContentFormat, row.ToArray()).Length) : 0);
 
-            var hasHeader = builder.FormattedColumns != null && builder.FormattedColumns.Any() && builder.FormattedColumns.Max(x => (x ?? string.Empty).ToString().Length) > 0 ;
-            
+            var hasHeader = builder.FormattedColumns != null && builder.FormattedColumns.Any() && builder.FormattedColumns.Max(x => (x ?? string.Empty).ToString().Length) > 0;
+
             // header
             if (hasHeader)
             {
@@ -538,7 +539,7 @@ namespace ConsoleTableExt
                     if (tableTopLine != null && tableTopLine.Trim().Length > 0)
                     {
                         strBuilder.AppendLine(tableTopLine);
-                    }                    
+                    }
                 }
 
                 var headerSlices = builder.FormattedColumns.ToArray();
@@ -840,7 +841,7 @@ namespace ConsoleTableExt
                             if (item.Value != null)
                             {
                                 result.Add(item.Value.Invoke(builder));
-                            }                                
+                            }
                         }
                     }
                     break;

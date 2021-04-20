@@ -1,12 +1,12 @@
-﻿using ConsoleTableExt;
+﻿using ConsoleTableExtNet5;
+using ConsoleTableExtNet5.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Linq;
 
-namespace ConsoleTableApp
-{ 
+namespace ConsoleTableAppNet5
+{
     class Program
     {
         static void Main(string[] args)
@@ -14,9 +14,9 @@ namespace ConsoleTableApp
             ConsoleTableBuilder.From(() => {
                 return new ConsoleTableBaseData
                 {
-                    Rows = new List<List<object>> { 
+                    Rows = new List<List<object>> {
                         new List<object> { "a1", "b1", "c1" } ,
-                        new List<object> { "a2", "b2", "c2" } 
+                        new List<object> { "a2", "b2", "c2" }
                     },
                     Column = new List<object>
                     {
@@ -139,7 +139,7 @@ namespace ConsoleTableApp
                         return text + " $";
                     }
                 })
-                .WithColumnFormatter(3, (text)=> "#")
+                .WithColumnFormatter(3, (text) => "#")
                 .ExportAndWriteLine();
 
             _____________________________PrintDemoDivider();
