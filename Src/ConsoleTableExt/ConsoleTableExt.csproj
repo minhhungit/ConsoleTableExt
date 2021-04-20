@@ -2,17 +2,17 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net45;net35</TargetFrameworks>
         <Title>ConsoleTableExt</Title>
-        <Version>3.1.6</Version>
+        <Version>3.1.7</Version>
         <Copyright>Copyright 2017 minhhungit</Copyright>
         <Description>A fluent library to print out a nicely formatted table in a console application C#</Description>
         <Authors>Hung Vo</Authors>
         <PackageLicenseUrl>https://github.com/minhhungit/ConsoleTableExt/blob/master/LICENSE</PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/minhhungit/ConsoleTableExt/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/minhhungit/ConsoleTableExt/</RepositoryUrl>
-        <PackageTags>console text-table fluent console-table</PackageTags>
-        <PackageReleaseNotes>fix bug: list crashed when using with string type</PackageReleaseNotes>
-        <AssemblyVersion>3.1.6</AssemblyVersion>
-        <FileVersion>3.1.6</FileVersion>
+        <PackageTags>console text-table fluent console-table6</PackageTags>
+        <PackageReleaseNotes>allow developer support their datasource</PackageReleaseNotes>
+        <AssemblyVersion>3.1.7</AssemblyVersion>
+        <FileVersion>3.1.7</FileVersion>
         <Company />
         <PackageIconUrl>https://raw.githubusercontent.com/minhhungit/ConsoleTableExt/master/wiki/Images/icon.ico</PackageIconUrl>
     </PropertyGroup>

@@ -11,6 +11,22 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
+            ConsoleTableBuilder.From(() => {
+                return new ConsoleTableBaseData
+                {
+                    Rows = new List<List<object>> { 
+                        new List<object> { "a1", "b1", "c1" } ,
+                        new List<object> { "a2", "b2", "c2" } 
+                    },
+                    Column = new List<object>
+                    {
+                        "-A-", "-B-", "-C-"
+                    }
+                };
+            })
+            .WithFormat(ConsoleTableBuilderFormat.Alternative)
+            .ExportAndWriteLine();
+
             ConsoleTableBuilder.From(new List<int> { 1, 2, 3, 4, 5, 6 })
                .WithFormat(ConsoleTableBuilderFormat.Alternative)
                .ExportAndWriteLine();

@@ -5,6 +5,12 @@ using System.Linq;
 
 namespace ConsoleTableExt
 {
+    public class ConsoleTableBaseData
+    {
+        public List<object> Column { get; set; }
+        public List<List<object>> Rows { get; set; }
+    }
+
     public class ConsoleTableBuilder
     {
         internal List<object> Column { get; set; }
@@ -40,6 +46,44 @@ namespace ConsoleTableExt
             Column = new List<object>();
             Rows = new List<List<object>>();
             TableFormat = ConsoleTableBuilderFormat.Default;
+        }
+
+        /// <summary>
+        /// This function allow developer implement themeself data-source
+        /// </summary>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public static ConsoleTableBuilder From(Func<ConsoleTableBaseData> func)
+        {
+            if (func != null)
+            {
+                var baseData = func.Invoke();
+                return From(baseData);
+            }
+            else
+            {
+                throw new Exception("invaild function");
+            }
+        }
+
+        public static ConsoleTableBuilder From(ConsoleTableBaseData baseData)
+        {
+            var builder = new ConsoleTableBuilder();
+
+            if (baseData != null)
+            {
+                if (baseData.Rows != null)
+                {
+                    builder.Rows = baseData.Rows;
+                }
+
+                if (baseData.Column != null)
+                {
+                    builder.Column = baseData.Column;
+                }
+            }
+
+            return builder;
         }
 
         public static ConsoleTableBuilder From(List<int> list)
