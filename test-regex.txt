@@ -1,0 +1,25 @@
+static void Main(string[] args)
+{
+	var format = "{0,15} │ {1,30} │ {2,*13} │ {3,*2} │ {4,-14}";
+
+	var items = Regex.Replace(format, @"\{(.*?)}", m =>
+	{
+		if (m.Value.Contains("*"))
+		{
+			var newValue = m.Value.Replace("*", "");
+			int oldLength = int.Parse(newValue.Replace("{", "").Replace("}", "").Split(',')[1]);
+
+			return string.Join("", Enumerable.Range(0, oldLength / 2).Select(x => " ")) + m.Value.Replace(string.Format(",*{0}", oldLength), string.Format(",{0}", oldLength / 2));
+		}
+		return m.Value;
+	});
+
+	foreach (var item in items)
+	{
+		Console.WriteLine(item);
+	}
+	Console.WriteLine("Hello World!");
+}
+
+// https://www.jerriepelser.com/blog/using-ansi-color-codes-in-net-console-apps/
+// https://en.wikipedia.org/wiki/ANSI_escape_code

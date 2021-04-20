@@ -17,3 +17,12 @@
 /Src/ConsoleTableApp/obj/Release
 /Src/ConsoleTableExt/bin/Release
 .vs/
+/ConsoleTableExt.Tests/bin/Debug
+/ConsoleTableExt.Tests/obj/Debug
+/packages
+/ConsoleTableExt.Tests/bin/Release
+/ConsoleTableExt.Tests/obj/Release
+/Src/ConsoleTableExt.Tests/bin/Debug
+/Src/ConsoleTableExt.Tests/bin/Release
+/Src/ConsoleTableExt.Tests/obj/Debug
+/Src/ConsoleTableExt.Tests/obj/Release
