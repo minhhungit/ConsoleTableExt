@@ -1,3 +1,9 @@
+## 3.1.7 (2021-04-20)
+- allow developer support their datasource
+
+## 3.1.6 (2021-04-20)
+- fix bug #25 List crashed when using with string type
+
 ## 3.1.5 (2021-02-28)
 - introduce WithHeaderTextAlignment, allow user custom header alignment, if it's not defined, it will get text alignment setting, default is left
 - fix bug: double header formatter
