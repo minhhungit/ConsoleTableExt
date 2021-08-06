@@ -9,6 +9,14 @@ namespace ConsoleTableExt.Tests
     [TestFixture]
     public  class CustomFormats
     {
+        public CustomFormats()
+        {
+            //set CultureInfo default en-US
+            System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
+            System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = ci;
+        }
+
         [Test]
         public void DefaultFormatWithDataTable()
         {

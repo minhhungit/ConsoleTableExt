@@ -8,6 +8,14 @@ namespace ConsoleTableExt.Tests
     [TestFixture]
     public  class DefaultFormats
     {
+        public DefaultFormats()
+        {
+            //set CultureInfo default en-US
+            System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
+            System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = ci;
+        }
+
         [Test]
         public void DefaultFormatWithDataTable()
         {
@@ -103,6 +111,27 @@ Bradley Greer  Software Engineer             San Francisco 28  11/15/2017 12:00:
 
             var lines = strBuilder.ToString().Split('\n');
             Assert.IsTrue(lines.Length == 7);
+        }
+
+        [Test]
+        public void AlternativeFormatWithUtf8CharactersDataTable()
+        {
+            var strBuilder =
+               ConsoleTableBuilder
+               .From<dynamic>(SampleData.SampleListWithUtf8Characters)
+               .WithFormat(ConsoleTableBuilderFormat.Alternative)
+               .Export();
+
+            Assert.IsTrue(strBuilder.ToString() == @"
++-----+-----------------+-----------+------+---------+
+| Id  | Name            | Host      | Port | status  |
++-----+-----------------+-----------+------+---------+
+| xxx | tab其它语言test | 127.0.0.1 | 80   | success |
++-----+-----------------+-----------+------+---------+
+".TrimStart());
+
+            var lines = strBuilder.ToString().Split('\n');
+            Assert.IsTrue(lines.Length == 6);
         }
     }
 }

@@ -493,6 +493,7 @@ namespace ConsoleTableExt
 
             builder.PopulateFormattedColumnsRows();
             var columnLengths = builder.GetCadidateColumnLengths();
+            var columnNoUtf8CharasLengths = builder.GetCadidateColumnLengths(false);
             builder.CenterRowContent(columnLengths);
 
             var filledMap = FillCharMap(builder.CharMapPositionStore);
@@ -507,6 +508,7 @@ namespace ConsoleTableExt
 
             var tableTopLine = builder.CreateTableTopLine(columnLengths, filledMap);
             var tableRowContentFormat = builder.CreateTableContentLineFormat(columnLengths, filledMap);
+            var tableRowContentFormatNoUtf8Charas = builder.CreateTableContentLineFormat(columnNoUtf8CharasLengths, filledMap);
             var tableMiddleLine = builder.CreateTableMiddleLine(columnLengths, filledMap);
             var tableBottomLine = builder.CreateTableBottomLine(columnLengths, filledMap);
 
@@ -569,7 +571,7 @@ namespace ConsoleTableExt
             //    return string.Format(tableRowContentFormat, Enumerable.Range(0, rowSlices.Length).Select(idx => builder.FormatterStore.ContainsKey(idx) ? builder.FormatterStore[idx](rowSlices[idx] == null ? string.Empty : rowSlices[idx].ToString()) : rowSlices[idx] == null ? string.Empty : rowSlices[idx].ToString()).ToArray());
             //}).ToList();
 
-            var results = builder.FormattedRows.Select(row => string.Format(tableRowContentFormat, row.ToArray())).ToList();
+            var results = builder.FormattedRows.Select(row => string.Format(tableRowContentFormatNoUtf8Charas, row.ToArray())).ToList();
 
             var isFirstRow = true;
             foreach (var row in results)
