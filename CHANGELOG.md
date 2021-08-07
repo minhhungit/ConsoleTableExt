@@ -1,3 +1,6 @@
+## 3.1.8 (2021-08-07)
+- fix bug: #30 Misplaced format If there are UTF-8 characters in the data (thanks @haptear)
+
 ## 3.1.7 (2021-04-20)
 - allow developer support their datasource
 
