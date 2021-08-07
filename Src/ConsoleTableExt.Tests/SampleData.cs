@@ -50,6 +50,8 @@ namespace ConsoleTableExt.Tests
             new Employee("Bradley Greer", "Software Engineer", "San Francisco", 28, new DateTime(2017, 11, 15))
         };
 
+        public static List<object> SampleListWithUtf8Characters = new List<object>() { new { Id = "xxx", Name = "tab其它语言test", Host = "127.0.0.1", Port = 80, status = "success" } };
+
         public class Employee
         {
             public Employee(string name, string position, string office, int age, DateTime startDate)

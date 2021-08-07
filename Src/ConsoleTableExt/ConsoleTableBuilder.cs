@@ -337,7 +337,7 @@ namespace ConsoleTableExt
             return new string(' ', leftPadding) + s + new string(' ', rightPadding);
         }
 
-        internal List<int> GetCadidateColumnLengths()
+        internal List<int> GetCadidateColumnLengths(bool withUtf8Characters = true)
         {
             var columnLengths = new List<int>();
 
@@ -351,7 +351,7 @@ namespace ConsoleTableExt
                 if (FormattedColumns != null)
                 {
                     numberOfColumns = FormattedColumns.Count;
-                }                
+                }
             }
 
             if (numberOfColumns == 0)
@@ -372,12 +372,12 @@ namespace ConsoleTableExt
                     maxRow = FormattedRows
                         .Where(x => i < x.Count)
                         .Select(x => x[i]) // list cells of column i
-                        .Max(x => x == null ? 0 : x.ToString().Length);
+                        .Max(x => x == null ? 0 : x.ToString().RealLength(withUtf8Characters));
                 }
 
-                if (FormattedColumns.ToArray().Length > i && (FormattedColumns[i] ?? string.Empty).ToString().Length > maxRow)
+                if (FormattedColumns.ToArray().Length > i && (FormattedColumns[i] ?? string.Empty).ToString().RealLength(withUtf8Characters) > maxRow)
                 {
-                    maxRow = FormattedColumns[i].ToString().Length;
+                    maxRow = FormattedColumns[i].ToString().RealLength(withUtf8Characters);
                 }
 
                 if (MinLengthData != null && MinLengthData.ContainsKey(i))
