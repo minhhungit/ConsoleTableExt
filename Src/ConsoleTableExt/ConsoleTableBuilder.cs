@@ -480,10 +480,10 @@ namespace ConsoleTableExt
                         startPoint = 1;
                         break;
                     case TextAligntment.Right:
-                        startPoint = line.Length - 1 - TableTitle.Length;
+                        startPoint = line.Length - 1 - TableTitle.RealLength(true);
                         break;
                     case TextAligntment.Center:
-                        startPoint = (line.Length - TableTitle.Length) / 2;
+                        startPoint = (line.Length - TableTitle.RealLength(true)) / 2;
                         break;
                     default:
                         break;
@@ -492,6 +492,7 @@ namespace ConsoleTableExt
                 TitlePositionStartAt = startPoint;
                 var newBeginTableFormat = line.Substring(0, startPoint);
                 newBeginTableFormat += TableTitle;
+                TitlePositionLength = TableTitle.Length;
                 int reallength = newBeginTableFormat.RealLength(true);
                 newBeginTableFormat += line.Substring(reallength, line.Length - reallength);
 
