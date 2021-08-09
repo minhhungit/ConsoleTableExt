@@ -119,19 +119,26 @@ Bradley Greer  Software Engineer             San Francisco 28  11/15/2017 12:00:
             var strBuilder =
                ConsoleTableBuilder
                .From<dynamic>(SampleData.SampleListWithUtf8Characters)
+               .WithTitle("a中123午b", ConsoleColor.Yellow, ConsoleColor.DarkGray)
                .WithFormat(ConsoleTableBuilderFormat.Alternative)
                .Export();
 
             Assert.IsTrue(strBuilder.ToString() == @"
-+-----+-----------------+-----------+------+---------+
-| Id  | Name            | Host      | Port | status  |
-+-----+-----------------+-----------+------+---------+
-| xxx | tab其它语言test | 127.0.0.1 | 80   | success |
-+-----+-----------------+-----------+------+---------+
++-------------+-------------- a中123午b +-----------+------+---------+
+| Id          | Name                    | Host      | Port | status  |
++-------------+-------------------------+-----------+------+---------+
+| 中午午午午c | tab其它语言test         | 127.0.0.1 | 80   | success |
++-------------+-------------------------+-----------+------+---------+
+| a中午b      | London语a言aa它xx       | 127.0.0.1 | 80   | success |
++-------------+-------------------------+-----------+------+---------+
+| Airi Satou  | Accountant              | 127.0.0.1 | 80   | Tokyo   |
++-------------+-------------------------+-----------+------+---------+
+| Ashton Cox  | Junior Technical Author | 127.0.0.1 | 80   | success |
++-------------+-------------------------+-----------+------+---------+
 ".TrimStart());
 
             var lines = strBuilder.ToString().Split('\n');
-            Assert.IsTrue(lines.Length == 6);
+            Assert.IsTrue(lines.Length == 12);
         }
     }
 }
