@@ -1,3 +1,6 @@
+## 3.1.9 (2021-08-16)
+- fix bug: #32 Misplaced format If there are UTF-8 characters in the data (thanks @haptear)
+
 ## 3.1.8 (2021-08-07)
 - fix bug: #30 Misplaced format If there are UTF-8 characters in the data (thanks @haptear)
 
