@@ -17,7 +17,7 @@ namespace ConsoleTableExt
             int i = 0;//count
             foreach (char newChar in value)
             {
-                if ((int)newChar > 127)
+                if (newChar >= 0x4e00 && newChar <= 0x9fbb)
                 {
                     //utf-8 characters
                     i += 2;

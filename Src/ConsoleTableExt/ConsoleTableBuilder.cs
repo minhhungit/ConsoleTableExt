@@ -93,7 +93,7 @@ namespace ConsoleTableExt
             {
                 builder.Rows.Add(new List<object> { value });
             }
-            
+
             return builder;
         }
 
@@ -221,7 +221,7 @@ namespace ConsoleTableExt
             if (rows == null)
             {
                 return builder;
-            }            
+            }
 
             foreach (var row in rows)
             {
@@ -269,7 +269,8 @@ namespace ConsoleTableExt
             {
                 FormattedRows.Add(
                     Enumerable.Range(0, Rows[i].Count)
-                    .Select(idx => {
+                    .Select(idx =>
+                    {
                         if (FormatterStore.ContainsKey(idx))
                         {
                             return FormatterStore[idx](Rows[i][idx] == null ? string.Empty : Rows[i][idx].ToString());
@@ -291,7 +292,7 @@ namespace ConsoleTableExt
                     if (TextAligmentData.ContainsKey(j) && TextAligmentData[j] == TextAligntment.Center)
                     {
                         FormattedRows[i][j] = CenteredString(FormattedRows[i][j], columnLengths[j]);
-                    }                    
+                    }
                 }
             }
         }
@@ -305,7 +306,7 @@ namespace ConsoleTableExt
                     if (HeaderTextAligmentData[i] == TextAligntment.Center)
                     {
                         columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
-                    }                    
+                    }
                 }
                 else
                 {
@@ -313,7 +314,7 @@ namespace ConsoleTableExt
                     {
                         columnSlices[i] = CenteredString(columnSlices[i], columnLengths[i]);
                     }
-                }                
+                }
             }
 
             return columnSlices;
@@ -472,18 +473,17 @@ namespace ConsoleTableExt
 
                 TableTitle = TableTitle.Trim();
                 TableTitle = " " + TableTitle + " ";
-
                 var startPoint = 0;
                 switch (TableTitleTextAlignment)
                 {
                     case TextAligntment.Left:
-                        startPoint = 1;                        
+                        startPoint = 1;
                         break;
                     case TextAligntment.Right:
-                        startPoint = line.Length - 1 - TableTitle.Length;
+                        startPoint = line.Length - 1 - TableTitle.RealLength(true);
                         break;
                     case TextAligntment.Center:
-                        startPoint = (line.Length - TableTitle.Length) / 2;
+                        startPoint = (line.Length - TableTitle.RealLength(true)) / 2;
                         break;
                     default:
                         break;
@@ -493,7 +493,8 @@ namespace ConsoleTableExt
                 var newBeginTableFormat = line.Substring(0, startPoint);
                 newBeginTableFormat += TableTitle;
                 TitlePositionLength = TableTitle.Length;
-                newBeginTableFormat += line.Substring(newBeginTableFormat.Length, line.Length - newBeginTableFormat.Length);
+                int reallength = newBeginTableFormat.RealLength(true);
+                newBeginTableFormat += line.Substring(reallength, line.Length - reallength);
 
                 line = newBeginTableFormat;
                 line = line.Replace("\0", " ");
@@ -563,6 +564,42 @@ namespace ConsoleTableExt
             }
         }
 
+        internal string CreateRawLineFormat(List<int> columnLengths, Dictionary<CharMapPositions, char> definition, params object[] args)
+        {
+            var borderLeft = definition[CharMapPositions.BorderLeft];
+            var divider = definition[CharMapPositions.DividerY];
+            var borderRight = definition[CharMapPositions.BorderRight];
+
+            if (columnLengths.Count > 0)
+            {
+                var result = Enumerable.Range(0, columnLengths.Count)
+                            .Select(i =>
+                            {
+                                var alignmentChar = string.Empty;
+                                if (TextAligmentData == null || !TextAligmentData.ContainsKey(i) || TextAligmentData[i] == TextAligntment.Left)
+                                {
+                                    alignmentChar = "-";
+                                }
+                                if (args.Length > i)
+                                {
+                                    string value = args[i]?.ToString() ?? "";
+                                    return PaddingLeft + "{" + i + "," + alignmentChar + (columnLengths[i] - (value.RealLength(true) - value.Length)) + "}" + PaddingRight;
+                                }
+                                else
+                                    return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
+
+                            })
+                            .Aggregate((s, a) => s + (CanRemoveDividerY() ? string.Empty : divider.ToString()) + a);
+
+                var line = (CanRemoveBorderLeft() ? string.Empty : borderLeft.ToString()) + result + (CanRemoveBorderRight() ? string.Empty : borderRight.ToString());
+
+                return line;
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
         internal string CreateTableMiddleLine(List<int> columnLengths, Dictionary<CharMapPositions, char> definition)
         {
             var dividerX = definition[CharMapPositions.DividerX];
@@ -664,7 +701,8 @@ namespace ConsoleTableExt
             if (columnLengths.Count > 0)
             {
                 var result = Enumerable.Range(0, columnLengths.Count)
-                            .Select(i => {
+                            .Select(i =>
+                            {
                                 var alignmentChar = string.Empty;
 
                                 if (HeaderTextAligmentData.ContainsKey(i))
@@ -680,7 +718,7 @@ namespace ConsoleTableExt
                                     {
                                         alignmentChar = "-";
                                     }
-                                }                                
+                                }
 
                                 return PaddingLeft + "{" + i + "," + alignmentChar + columnLengths[i] + "}" + PaddingRight;
                             })
@@ -744,7 +782,7 @@ namespace ConsoleTableExt
             else
             {
                 var data = new List<char> { };
-                data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.TopLeft) ? 
+                data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.TopLeft) ?
                     HeaderCharMapPositionStore[HeaderCharMapPositions.TopLeft] : CharMapPositionStore[CharMapPositions.TopLeft]);
 
                 data.Add(HeaderCharMapPositionStore.ContainsKey(HeaderCharMapPositions.BorderLeft) ?
@@ -757,7 +795,7 @@ namespace ConsoleTableExt
                 data.Add(CharMapPositionStore[CharMapPositions.BorderLeft]);
                 data.Add(CharMapPositionStore[CharMapPositions.BottomLeft]);
 
-                return 
+                return
                     data
                         .Select(x => x.ToString())
                         .Aggregate((s, a) => s + a)

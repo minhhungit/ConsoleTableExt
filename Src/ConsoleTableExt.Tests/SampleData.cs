@@ -24,7 +24,7 @@ namespace ConsoleTableExt.Tests
                 table.Rows.Add("Bradley Greer", "Software Engineer", "San Francisco", 28, new DateTime(2017, 11, 15));
 
                 return table;
-            }  
+            }
         }
 
         public static List<List<object>> SampleShortListData = new List<List<object>>
@@ -50,7 +50,12 @@ namespace ConsoleTableExt.Tests
             new Employee("Bradley Greer", "Software Engineer", "San Francisco", 28, new DateTime(2017, 11, 15))
         };
 
-        public static List<object> SampleListWithUtf8Characters = new List<object>() { new { Id = "xxx", Name = "tab其它语言test", Host = "127.0.0.1", Port = 80, status = "success" } };
+        public static List<object> SampleListWithUtf8Characters = new List<object>() {
+                new { Id="中午午午午c", Name="tab其它语言test", Host="127.0.0.1", Port=80, status ="success" } ,
+                new { Id="a中午b", Name="London语a言aa它xx", Host="127.0.0.1", Port=80, status ="success" },
+                new { Id="Airi Satou", Name="Accountant", Host="127.0.0.1", Port=80, status ="Tokyo" },
+                new { Id="Ashton Cox", Name="Junior Technical Author", Host="127.0.0.1", Port=80, status ="success" }
+            };
 
         public class Employee
         {

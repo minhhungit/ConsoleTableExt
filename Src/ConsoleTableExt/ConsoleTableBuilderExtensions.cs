@@ -311,7 +311,7 @@ namespace ConsoleTableExt
 
                     builder.HeaderCharMapPositionStore = new Dictionary<HeaderCharMapPositions, char>
                     {
-                        { HeaderCharMapPositions.BorderBottom, '-' }                        
+                        { HeaderCharMapPositions.BorderBottom, '-' }
                     };
 
                     builder.PaddingLeft = string.Empty;
@@ -360,7 +360,7 @@ namespace ConsoleTableExt
                 if (builder.Column != null)
                 {
                     numberOfColumns = builder.Column.Count();
-                }                
+                }
             }
 
             if (numberOfColumns == 0)
@@ -416,28 +416,28 @@ namespace ConsoleTableExt
             for (int i = 0; i < linesCount; i++)
             {
                 var row = string.Empty;
-                
+
                 switch (alignment)
                 {
                     case TableAligntment.Left:
                         row = lines[i];
                         break;
                     case TableAligntment.Center:
-                        row = String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].Length / 2)) + "}", lines[i]);
+                        row = String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].RealLength(true) / 2) - (lines[i].RealLength(true) - lines[i].Length)) + "}", lines[i]);
                         break;
                     case TableAligntment.Right:
-                        row = String.Format("{0," + Console.WindowWidth + "}", new string(' ', Console.WindowWidth - lines[i].Length) + lines[i]);
+                        row = new string(' ', Console.WindowWidth - lines[i].RealLength(true)) + lines[i];
                         break;
                 }
 
-                if (i == 0 
-                    && !string.IsNullOrEmpty(builder.TableTitle) 
-                    && builder.TableTitle.Trim().Length != 0 
+                if (i == 0
+                    && !string.IsNullOrEmpty(builder.TableTitle)
+                    && builder.TableTitle.Trim().Length != 0
                     && !builder.TableTitleColor.IsForegroundColorNull
                     && builder.TitlePositionStartAt > 0
                     && builder.TitlePositionLength > 0)
                 {
-                    var newTitlePositionStartAt = builder.TitlePositionStartAt + (row.Length - lines[i].Length); 
+                    var newTitlePositionStartAt = builder.TitlePositionStartAt + (row.Length - lines[i].Length);
 
                     Console.Write(row.Substring(0, newTitlePositionStartAt));
                     Console.ForegroundColor = builder.TableTitleColor.ForegroundColor;
@@ -473,7 +473,7 @@ namespace ConsoleTableExt
                         {
                             Console.WriteLine(row);
                         }
-                    }                    
+                    }
                 }
             }
         }
@@ -483,7 +483,7 @@ namespace ConsoleTableExt
             builder.ExportAndWrite(alignment);
             Console.Write('\n');
         }
-                
+
         private static StringBuilder CreateTableForCustomFormat(ConsoleTableBuilder builder)
         {
             if (builder.CharMapPositionStore == null)
@@ -504,11 +504,10 @@ namespace ConsoleTableExt
             for (int i = 0; i < topMetadataStringBuilder.Count; i++)
             {
                 strBuilder.AppendLine(topMetadataStringBuilder[i]);
-            }            
+            }
 
             var tableTopLine = builder.CreateTableTopLine(columnLengths, filledMap);
             var tableRowContentFormat = builder.CreateTableContentLineFormat(columnLengths, filledMap);
-            var tableRowContentFormatNoUtf8Charas = builder.CreateTableContentLineFormat(columnNoUtf8CharasLengths, filledMap);
             var tableMiddleLine = builder.CreateTableMiddleLine(columnLengths, filledMap);
             var tableBottomLine = builder.CreateTableBottomLine(columnLengths, filledMap);
 
@@ -526,8 +525,8 @@ namespace ConsoleTableExt
             // find the longest formatted line
             //var maxRowLength = Math.Max(0, builder.Rows.Any() ? builder.Rows.Max(row => string.Format(tableRowContentFormat, row.ToArray()).Length) : 0);
 
-            var hasHeader = builder.FormattedColumns != null && builder.FormattedColumns.Any() && builder.FormattedColumns.Max(x => (x ?? string.Empty).ToString().Length) > 0 ;
-            
+            var hasHeader = builder.FormattedColumns != null && builder.FormattedColumns.Any() && builder.FormattedColumns.Max(x => (x ?? string.Empty).ToString().Length) > 0;
+
             // header
             if (hasHeader)
             {
@@ -540,7 +539,7 @@ namespace ConsoleTableExt
                     if (tableTopLine != null && tableTopLine.Trim().Length > 0)
                     {
                         strBuilder.AppendLine(tableTopLine);
-                    }                    
+                    }
                 }
 
                 var headerSlices = builder.FormattedColumns.ToArray();
@@ -571,7 +570,12 @@ namespace ConsoleTableExt
             //    return string.Format(tableRowContentFormat, Enumerable.Range(0, rowSlices.Length).Select(idx => builder.FormatterStore.ContainsKey(idx) ? builder.FormatterStore[idx](rowSlices[idx] == null ? string.Empty : rowSlices[idx].ToString()) : rowSlices[idx] == null ? string.Empty : rowSlices[idx].ToString()).ToArray());
             //}).ToList();
 
-            var results = builder.FormattedRows.Select(row => string.Format(tableRowContentFormatNoUtf8Charas, row.ToArray())).ToList();
+            var results = builder.FormattedRows.Select(row =>
+            {
+                var rowFormate = builder.CreateRawLineFormat(columnLengths, filledMap, row.ToArray());
+                return string.Format(rowFormate, row.ToArray());
+
+            }).ToList();
 
             var isFirstRow = true;
             foreach (var row in results)
@@ -842,7 +846,7 @@ namespace ConsoleTableExt
                             if (item.Value != null)
                             {
                                 result.Add(item.Value.Invoke(builder));
-                            }                                
+                            }
                         }
                     }
                     break;
