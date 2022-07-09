@@ -142,7 +142,8 @@ namespace ConsoleTableExt
             return builder;
         }
 
-        public static ConsoleTableBuilder WithFormatter(this ConsoleTableBuilder builder, int columnIndex, Func<string, string> formatter)
+  
+        public static ConsoleTableBuilder WithFormatter(this ConsoleTableBuilder builder, int columnIndex, Func<object, string> formatter)
         {
             if (!builder.FormatterStore.ContainsKey(columnIndex))
             {
@@ -155,7 +156,6 @@ namespace ConsoleTableExt
 
             return builder;
         }
-
         public static ConsoleTableBuilder WithColumnFormatter(this ConsoleTableBuilder builder, int columnIndex, Func<string, string> formatter)
         {
             if (!builder.ColumnFormatterStore.ContainsKey(columnIndex))
@@ -426,7 +426,8 @@ namespace ConsoleTableExt
                         row = String.Format("{0," + ((Console.WindowWidth / 2) + (lines[i].RealLength(true) / 2) - (lines[i].RealLength(true) - lines[i].Length)) + "}", lines[i]);
                         break;
                     case TableAligntment.Right:
-                        row = new string(' ', Console.WindowWidth - lines[i].RealLength(true)) + lines[i];
+                        var count = Console.WindowWidth - lines[i].RealLength(true);
+                        row = new string(' ', count<0?0: count) + lines[i];
                         break;
                 }
 

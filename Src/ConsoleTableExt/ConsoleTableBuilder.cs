@@ -38,7 +38,7 @@ namespace ConsoleTableExt
         internal int TitlePositionStartAt { get; set; }
         internal int TitlePositionLength { get; set; }
 
-        internal Dictionary<int, Func<string, string>> FormatterStore = new Dictionary<int, Func<string, string>>();
+        internal Dictionary<int, Func<object, string>> FormatterStore = new Dictionary<int, Func<object, string>>();
         internal Dictionary<int, Func<string, string>> ColumnFormatterStore = new Dictionary<int, Func<string, string>>();
 
         private ConsoleTableBuilder()
@@ -273,7 +273,7 @@ namespace ConsoleTableExt
                     {
                         if (FormatterStore.ContainsKey(idx))
                         {
-                            return FormatterStore[idx](Rows[i][idx] == null ? string.Empty : Rows[i][idx].ToString());
+                            return FormatterStore[idx](Rows[i][idx] == null ? string.Empty : Rows[i][idx]);
                         }
                         else
                         {

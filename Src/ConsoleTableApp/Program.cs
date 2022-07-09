@@ -88,6 +88,18 @@ namespace ConsoleTableApp
 
             _____________________________PrintDemoDivider();
 
+            var strBuilder03 =
+            ConsoleTableBuilder
+            .From(SampleTableData())
+            .WithFormatter(4,f=>$"{f:yyyy-MM-dd HH:mm:ss.fff}")
+            .WithTitle("MARKDOWN WITH TITLE ???")
+            .WithPaddingLeft(string.Empty)
+            .WithFormat(ConsoleTableBuilderFormat.MarkDown)
+            .Export();
+            Console.WriteLine(strBuilder03);
+
+            _____________________________PrintDemoDivider();
+
             Console.WriteLine("Text alignment with table title");
             ConsoleTableBuilder.From(SampleListData)
                 //.WithFormat(ConsoleTableBuilderFormat.MarkDown)
@@ -104,7 +116,7 @@ namespace ConsoleTableApp
                 .WithTitle("HELLO I AM TITLE", ConsoleColor.Green, ConsoleColor.DarkGray, TextAligntment.Right)
                 .WithFormatter(1, (text) =>
                 {
-                    return text.ToUpper().Replace(" ", "-") + " «";
+                    return text.ToString().ToUpper().Replace(" ", "-") + " «";
                 })
                 .ExportAndWriteLine(TableAligntment.Center);
 
@@ -123,14 +135,14 @@ namespace ConsoleTableApp
                     { 3, 10 }
                 })
                 .WithFormatter(2, (text) => {
-                    char[] chars = text.ToCharArray();
+                    char[] chars = text.ToString().ToCharArray();
                     Array.Reverse(chars);
                     return new String(chars);
                 })
                 .WithTitle("Hello, everyone! This is the LONGEST TEXT EVER! I was inspired by the various other 'longest texts ever' on the internet, and I wanted to make my own. So here it is!".ToUpper(), ConsoleColor.Yellow, ConsoleColor.DarkMagenta)
                 .WithCharMapDefinition(CharMapDefinition.FrameDoublePipDefinition)
                 .WithFormatter(3, (text) => {
-                    if (string.IsNullOrEmpty(text) || text.Trim().Length == 0)
+                    if (string.IsNullOrEmpty(text.ToString()) || text.ToString().Trim().Length == 0)
                     {
                         return "0 $";
                     }
