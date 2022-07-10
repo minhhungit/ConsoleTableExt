@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net46;net35</TargetFrameworks>
         <Title>ConsoleTableExt</Title>
-        <Version>3.1.9</Version>
+        <Version>3.2.0</Version>
         <Copyright>Copyright 2017 minhhungit</Copyright>
         <Description>A fluent library to print out a nicely formatted table in a console application C#</Description>
         <Authors>Hung Vo</Authors>
