@@ -3,7 +3,7 @@
 A library to print out a nicely formatted table in a console application C#
 
 ### Nuget
-> Install-Package ConsoleTableExt
+> https://www.nuget.org/packages/ConsoleTableExt/
 
 ### Feature
 - Support [box-drawing characters](https://en.wikipedia.org/wiki/Box-drawing_character)
