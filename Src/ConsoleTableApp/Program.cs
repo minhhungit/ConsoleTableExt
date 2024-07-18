@@ -11,6 +11,29 @@ namespace ConsoleTableApp
     {
         static void Main(string[] args)
         {
+            var tableDataListListString = new List<List<string>>
+{
+    new List<string>{ "Sakura Yamamoto", "Support Engineer", "London", 46.ToString(), ""},
+    new List<string>{ "Serge Baldwin", "Data Coordinator", "San Francisco", 28.ToString(), "something else" },
+    new List<string>{ "Shad Decker", "Regional Director", "Edinburgh", "", ""},
+};
+
+            ConsoleTableBuilder
+               .From(tableDataListListString)
+               .ExportAndWriteLine();
+
+            var tableDataListListInt = new List<List<int>>
+{
+    new List<int>{ 1, 2, 3},
+    new List<int>{ 4, 5 },
+    new List<int>{ 6, 7, 8, 9},
+};
+            ConsoleTableBuilder
+               .From(tableDataListListInt)
+               .ExportAndWriteLine();
+
+
+
             ConsoleTableBuilder.From(() => {
                 return new ConsoleTableBaseData
                 {

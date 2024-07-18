@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;net46;net35</TargetFrameworks>
         <Title>ConsoleTableExt</Title>
-        <Version>3.2.0</Version>
+        <Version>3.3.0</Version>
         <Copyright>Copyright 2017 minhhungit</Copyright>
         <Description>A fluent library to print out a nicely formatted table in a console application C#</Description>
         <Authors>Hung Vo</Authors>
@@ -10,7 +10,8 @@
         <PackageProjectUrl>https://github.com/minhhungit/ConsoleTableExt/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/minhhungit/ConsoleTableExt/</RepositoryUrl>
         <PackageTags>console text-table fluent console-table6</PackageTags>
-        <PackageReleaseNotes>fix utf-8 issue</PackageReleaseNotes>
+        <PackageReleaseNotes>workarround issue 42 https://github.com/minhhungit/ConsoleTableExt/issues/42
+"Parameter count mismatch" exception when passing lists of strings</PackageReleaseNotes>
         <AssemblyVersion>3.1.9</AssemblyVersion>
         <FileVersion>3.1.9</FileVersion>
         <Company />

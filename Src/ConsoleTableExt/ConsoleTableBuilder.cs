@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -146,9 +147,77 @@ namespace ConsoleTableExt
             return builder;
         }
 
+        //public static ConsoleTableBuilder From(List<List<string>> list)
+        //{
+        //    var builder = new ConsoleTableBuilder();
+        //    if (list == null)
+        //    {
+        //        return builder;
+        //    }
+
+        //    foreach (var row in list)
+        //    {
+        //        builder.Rows.Add(row.Select(x => (object)x).ToList());
+        //    }
+
+        //    return builder;
+        //}
+
+        //public static ConsoleTableBuilder From<T>(List<List<T>> list) where T : sbyte, byte, short, ushort, int, uint, long, ulong, float, double, decimal, bool, char
+        //{
+        //    var builder = new ConsoleTableBuilder();
+        //    if (list == null)
+        //    {
+        //        return builder;
+        //    }
+
+        //    foreach (var row in list)
+        //    {
+        //        builder.Rows.Add(row.Select(x => (object)x).ToList());
+        //    }
+
+        //    return builder;
+        //}
+
         public static ConsoleTableBuilder From<T>(List<T> list) where T : class
         {
             var builder = new ConsoleTableBuilder();
+
+            var genericAgrs = typeof(T).GetGenericArguments();
+            if (genericAgrs.Count() > 0)
+            {
+                var elementType = genericAgrs[0];
+                var typeCode = Type.GetTypeCode(elementType);
+
+                if (typeCode != TypeCode.Object && typeCode != TypeCode.DBNull)
+                {
+                    // T is a List of a primitive type (e.g. List<string>, List<int>, etc.)
+
+                    
+                    if (list == null)
+                    {
+                        return builder;
+                    }
+
+                    //var objectList = new List<List<object>>();
+
+                    foreach (var item in list)
+                    {
+                        List<object> row = new List<object>();
+                        foreach (var element in (IEnumerable)item)
+                        {
+                            row.Add(element);
+                        }
+                        //objectList.Add(row);
+
+                        builder.Rows.Add(row);
+                    }
+
+                    return builder;
+                }
+            }
+
+            // T is a List of a non-primitive type (e.g. List<MyClass>, etc.)
             if (list == null)
             {
                 return builder;
